@@ -42,6 +42,9 @@ class GymClient:
         data = self.client_socket.recv(4096)
         return pickle.loads(data)
 
+    def seed(self):
+        return
+
     def make(self, name):
         response = self.send_command("make", name=name)
         self.action_space = space_from_dict(
