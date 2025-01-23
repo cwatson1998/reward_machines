@@ -61,6 +61,7 @@ class GymClient:
     def get_events(self):
         # This is too much ipc. I should send the events along with every step and reset.
         response = self.send_command('get_events')
+        print(response['events'])
         return response['events']
 
     # def make(self, **kwargs):
@@ -76,7 +77,7 @@ class GymClient:
         response = self.send_command('step', action=action)
         # The info field that we return needs to have any data that is needed for recreating the reward function.
         # raise NotImplementedError("chris")
-        print(response['info'])
+        # print(response['info'])
         return response['obs'], response['reward'], response['done'], response['info']
 
     def close(self):
