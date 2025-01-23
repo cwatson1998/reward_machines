@@ -48,6 +48,9 @@ class GymClient:
             response['action_space_construction_dict'])
         self.observation_space = space_from_dict(
             response['observation_space_construction_dict'])
+        metadata = {'render.modes': []}
+        reward_range = (-float('inf'), float('inf'))
+        spec = None
 
     def get_events(self):
         response = self.send_command('get_events')
