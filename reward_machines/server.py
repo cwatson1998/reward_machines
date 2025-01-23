@@ -6,6 +6,7 @@ import gym
 from collections import defaultdict
 import tensorflow as tf
 import numpy as np
+from gym import spaces
 
 import socket
 import pickle
@@ -31,7 +32,7 @@ from client import GymClient
 # below this line is bad stuff
 
 
-class GymServer:
+class GymServer():
     def __init__(self, host='localhost', port=5000):
         # assert env_name is not None
         self.host = host
@@ -65,11 +66,13 @@ class GymServer:
                     if message['name'] == 'GridEnv_OfficeWorld':
                         self.env = OfficeWorld()
                         self.env = GridEnv(self.env)
-                        response = {'status': 'open'}
 
                     else:
                         raise NotImplementedError(
                             "RM Server received unknown env name "+str(message['name']))
+                    # Space construction dict needs to be manually added to each env.
+                    # See GridEnv for an example.
+                    response = self.env.space_construction_dict
 
                     # I got rid of this.
                     # # RM specific. Change this for ILG Learn

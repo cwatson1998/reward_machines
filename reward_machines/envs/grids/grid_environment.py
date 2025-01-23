@@ -19,6 +19,24 @@ class GridEnv(gym.Env):
         self.observation_space = spaces.Box(
             low=0, high=max([N, M]), shape=(2,), dtype=np.uint8)
 
+        # Added by Chris to put into the message.
+        action_space_construction_dict = dict(
+            space_type="Discrete",
+            space_args=[4],
+            space_primitive_kwargs={},
+            space_dtype=None
+        )
+        observation_space_construction_dict = dict(
+            space_type="Box",
+            space_args=[],
+            space_primitive_kwargs=dict(low=0, high=max([N, M]), shape=(2,)),
+            space_dtype="np.uint8"
+        )
+        self.space_construction_dict = dict(
+            action_space_construction_dict=action_space_construction_dict,
+            observation_space_construction_dict=observation_space_construction_dict
+        )
+
     def get_events(self):
         return self.env.get_true_propositions()
 

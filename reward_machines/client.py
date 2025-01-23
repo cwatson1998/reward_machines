@@ -1,6 +1,23 @@
 import socket
 import pickle
 import numpy as np
+from gym import spaces
+
+
+def space_from_dict(construction_dict):
+    args = construction_dict['space_args']
+    kwargs = construction_dict['space_primitive_kwargs']
+    if construction_dict['space_dtype'] is not None:
+        if construction_dict['space_dtype'] == 'np.uint8':
+            kwargs['dtype'] = np.uint8
+        else:
+            raise NotImplementedError(
+                "A space_construction_dict provided the unknown dtype "+str(construction_dict['space_dtype']))
+    # Now kwargs includes the dtype.
+    if construction_dict['space_type'] == 'Discrete':
+        return spaces.Discrete(*args, **kwargs)
+    elif construction_dict['space_type'] == 'Box':
+        return spaces.Box(*args, **kwargs)
 
 
 class GymClient:
@@ -26,7 +43,11 @@ class GymClient:
         return pickle.loads(data)
 
     def make(self, name):
-        self.send_command("make", name=name)
+        response = self.send_command("make", name=name)
+        self.action_space = space_from_dict(
+            response['space_construction_dict']['action_space_construction_dict'])
+        self.observation_space = space_from_dict(
+            response['space_construction_dict']['observation_space_construction_dict'])
 
     def get_events(self):
         response = self.send_command('get_events')
