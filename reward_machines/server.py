@@ -23,8 +23,8 @@ from importlib import import_module
 import envs
 from envs.water.water_world import Ball, BallAgent
 from reward_machines.rm_environment import RewardMachineWrapper
-from reward_machines.envs.grids.office_world import OfficeWorld
-from reward_machines.envs.grids.grid_environment import GridEnv
+from envs.grids.office_world import OfficeWorld
+from envs.grids.grid_environment import GridEnv
 from cmd_util import make_vec_env, make_env, common_arg_parser
 from client import GymClient
 
