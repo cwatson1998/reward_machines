@@ -3,6 +3,7 @@ import gym
 import pickle
 import numpy as np
 import sys
+from importlib import import_module
 from cmd_util import make_env
 from reward_machines.envs.grids.office_world import OfficeWorld
 from reward_machines.envs.grids.grid_environment import GridEnv
@@ -63,7 +64,6 @@ class GymServer:
                     assert self.env is not None, "Need to make env first"
                     # Propositions are returned as strings
                     message = {'events': self.env.get_events()}
-
                 elif message['command'] == 'reset':
                     assert self.env is not None, "Need to make env first"
                     # obs, info = self.env.reset()
