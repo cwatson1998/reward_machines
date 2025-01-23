@@ -1,4 +1,28 @@
 import sys
+import re
+import multiprocessing
+import os.path as osp
+import gym
+from collections import defaultdict
+import tensorflow as tf
+import numpy as np
+
+from baselines.common.vec_env import VecFrameStack, VecNormalize, VecEnv
+from baselines.common.vec_env.vec_video_recorder import VecVideoRecorder
+from baselines.common.cmd_util import parse_unknown_args
+from baselines.common.tf_util import get_session
+from baselines import logger
+from importlib import import_module
+
+
+# Importing our environments and auxiliary functions
+import envs
+from envs.water.water_world import Ball, BallAgent
+from reward_machines.rm_environment import RewardMachineWrapper
+from cmd_util import make_vec_env, make_env, common_arg_parser
+from client import GymClient
+
+import sys
 import os.path as osp
 from collections import defaultdict
 import numpy as np
