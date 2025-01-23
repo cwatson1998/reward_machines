@@ -42,7 +42,8 @@ class GymClient:
         data = self.client_socket.recv(4096)
         return pickle.loads(data)
 
-    def seed(self):
+    def seed(self, *args, **kwargs):
+        print("Client does not pass seed.")
         return
 
     def make(self, name):
