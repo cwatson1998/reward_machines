@@ -34,6 +34,7 @@ class GymClient:
 
     def send_command(self, command, **kwargs):
         # If you add more to the message, make will break, because I pass message with 'command' removed to the env's make function on serverside.
+        # Actually I think the little note above is not true?
         message = {'command': command}
         message.update(kwargs)
         self.client_socket.sendall(pickle.dumps(message))
@@ -58,6 +59,7 @@ class GymClient:
         self.unwrapped = self
 
     def get_events(self):
+        # This is too much ipc. I should send the events along with every step and reset.
         response = self.send_command('get_events')
         return response['events']
 
@@ -72,6 +74,8 @@ class GymClient:
 
     def step(self, action):
         response = self.send_command('step', action=action)
+        # The info field that we return needs to have any data that is needed for recreating the reward function.
+        print(response['info'])
         return response['obs'], response['reward'], response['done'], response['info']
 
     def close(self):
