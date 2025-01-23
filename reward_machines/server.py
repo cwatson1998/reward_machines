@@ -65,6 +65,8 @@ class GymServer:
                     if message['name'] == 'GridEnv_OfficeWorld':
                         self.env = OfficeWorld()
                         self.env = GridEnv(self.env)
+                        response = {'status': 'open'}
+
                     else:
                         raise NotImplementedError(
                             "RM Server received unknown env name "+str(message['name']))
@@ -85,7 +87,7 @@ class GymServer:
                 elif message['command'] == 'get_events':
                     assert self.env is not None, "Need to make env first"
                     # Propositions are returned as strings
-                    message = {'events': self.env.get_events()}
+                    response = {'events': self.env.get_events()}
                 elif message['command'] == 'reset':
                     assert self.env is not None, "Need to make env first"
                     # obs, info = self.env.reset()
