@@ -45,9 +45,9 @@ class GymClient:
     def make(self, name):
         response = self.send_command("make", name=name)
         self.action_space = space_from_dict(
-            response['space_construction_dict']['action_space_construction_dict'])
+            response['action_space_construction_dict'])
         self.observation_space = space_from_dict(
-            response['space_construction_dict']['observation_space_construction_dict'])
+            response['observation_space_construction_dict'])
 
     def get_events(self):
         response = self.send_command('get_events')
