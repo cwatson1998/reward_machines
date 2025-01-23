@@ -1,17 +1,23 @@
-import gym, random
+import gym
+import random
 from gym import spaces
 import numpy as np
 from reward_machines.rm_environment import RewardMachineEnv
 from envs.grids.craft_world import CraftWorld
 from envs.grids.office_world import OfficeWorld
 from envs.grids.value_iteration import value_iteration
+from client import GymClient
+
 
 class GridEnv(gym.Env):
+    ''' Chris: This is what it would be good to splice.'''
+
     def __init__(self, env):
         self.env = env
-        N,M      = self.env.map_height, self.env.map_width
-        self.action_space = spaces.Discrete(4) # up, right, down, left
-        self.observation_space = spaces.Box(low=0, high=max([N,M]), shape=(2,), dtype=np.uint8)
+        N, M = self.env.map_height, self.env.map_width
+        self.action_space = spaces.Discrete(4)  # up, right, down, left
+        self.observation_space = spaces.Box(
+            low=0, high=max([N, M]), shape=(2,), dtype=np.uint8)
 
     def get_events(self):
         return self.env.get_true_propositions()
@@ -19,7 +25,7 @@ class GridEnv(gym.Env):
     def step(self, action):
         self.env.execute_action(action)
         obs = self.env.get_features()
-        reward = 0 # all the reward comes from the RM
+        reward = 0  # all the reward comes from the RM
         done = False
         info = {}
         return obs, reward, done, info
@@ -34,6 +40,7 @@ class GridEnv(gym.Env):
     def get_model(self):
         return self.env.get_model()
 
+
 class GridRMEnv(RewardMachineEnv):
     def __init__(self, env, rm_files):
         super().__init__(env, rm_files)
@@ -41,7 +48,7 @@ class GridRMEnv(RewardMachineEnv):
     def render(self, mode='human'):
         if mode == 'human':
             # commands
-            str_to_action = {"w":0,"d":1,"s":2,"a":3}
+            str_to_action = {"w": 0, "d": 1, "s": 2, "a": 3}
 
             # play the game!
             done = True
@@ -87,15 +94,16 @@ class GridRMEnv(RewardMachineEnv):
         ----------
         List with the optimal average-reward-per-step per reward machine
         """
-        S,A,L,T = self.env.get_model()
+        S, A, L, T = self.env.get_model()
         print("\nComputing optimal policies... ", end='', flush=True)
-        optimal_policies = [value_iteration(S,A,L,T,rm,gamma) for rm in self.reward_machines]
+        optimal_policies = [value_iteration(
+            S, A, L, T, rm, gamma) for rm in self.reward_machines]
         print("Done!")
         optimal_ARPS = [[] for _ in range(len(optimal_policies))]
         print("\nEvaluating optimal policies.")
         for ep in range(num_episodes):
             if ep % 100 == 0 and ep > 0:
-                print("%d/%d"%(ep,num_episodes))
+                print("%d/%d" % (ep, num_episodes))
             self.reset()
             s = tuple(self.obs)
             u = self.current_u_id
@@ -103,7 +111,8 @@ class GridRMEnv(RewardMachineEnv):
             rewards = []
             done = False
             while not done:
-                a = random.choice(A) if random.random() < epsilon else optimal_policies[rm_id][(s,u)]
+                a = random.choice(A) if random.random(
+                ) < epsilon else optimal_policies[rm_id][(s, u)]
                 _, r, done, _ = self.step(a)
                 rewards.append(r)
                 s = tuple(self.obs)
@@ -116,71 +125,98 @@ class GridRMEnv(RewardMachineEnv):
 
 class OfficeRMEnv(GridRMEnv):
     def __init__(self):
-        rm_files = ["./envs/grids/reward_machines/office/t%d.txt"%i for i in range(1,5)]
+        rm_files = ["./envs/grids/reward_machines/office/t%d.txt" %
+                    i for i in range(1, 5)]
         env = OfficeWorld()
-        super().__init__(GridEnv(env),rm_files)
+        super().__init__(GridEnv(env), rm_files)
+
+
+class OfficeRMEnvRemote(GridRMEnv):
+    def __init__(self):
+        rm_files = ["./envs/grids/reward_machines/office/t%d.txt" %
+                    i for i in range(1, 5)]
+        # Chris. It is best to put the grid env into the remote.
+        grid_env = GymClient()
+        grid_env.make("GridEnv_OfficeWorld")
+        # env = OfficeWorld()
+        # grid_env = GridEnv(env)
+        super().__init__(grid_env, rm_files)
+
 
 class OfficeRM3Env(GridRMEnv):
     def __init__(self):
         rm_files = ["./envs/grids/reward_machines/office/t3.txt"]
         env = OfficeWorld()
-        super().__init__(GridEnv(env),rm_files)
+        super().__init__(GridEnv(env), rm_files)
+
 
 class CraftRMEnv(GridRMEnv):
     def __init__(self, file_map):
-        rm_files = ["./envs/grids/reward_machines/craft/t%d.txt"%i for i in range(1,11)]
+        rm_files = ["./envs/grids/reward_machines/craft/t%d.txt" %
+                    i for i in range(1, 11)]
         env = CraftWorld(file_map)
         super().__init__(GridEnv(env), rm_files)
+
 
 class CraftRMEnvM0(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_0.txt"
         super().__init__(file_map)
 
+
 class CraftRMEnvM1(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_1.txt"
         super().__init__(file_map)
+
 
 class CraftRMEnvM2(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_2.txt"
         super().__init__(file_map)
 
+
 class CraftRMEnvM3(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_3.txt"
         super().__init__(file_map)
+
 
 class CraftRMEnvM4(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_4.txt"
         super().__init__(file_map)
 
+
 class CraftRMEnvM5(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_5.txt"
         super().__init__(file_map)
+
 
 class CraftRMEnvM6(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_6.txt"
         super().__init__(file_map)
 
+
 class CraftRMEnvM7(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_7.txt"
         super().__init__(file_map)
+
 
 class CraftRMEnvM8(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_8.txt"
         super().__init__(file_map)
 
+
 class CraftRMEnvM9(CraftRMEnv):
     def __init__(self):
         file_map = "./envs/grids/maps/map_9.txt"
         super().__init__(file_map)
+
 
 class CraftRMEnvM10(CraftRMEnv):
     def __init__(self):
@@ -189,64 +225,75 @@ class CraftRMEnvM10(CraftRMEnv):
 
 # ----------------------------------------------- SINGLE TASK
 
+
 class CraftRM10Env(GridRMEnv):
     def __init__(self, file_map):
         rm_files = ["./envs/grids/reward_machines/craft/t10.txt"]
         env = CraftWorld(file_map)
         super().__init__(GridEnv(env), rm_files)
 
+
 class CraftRM10EnvM0(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_0.txt"
         super().__init__(file_map)
+
 
 class CraftRM10EnvM1(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_1.txt"
         super().__init__(file_map)
 
+
 class CraftRM10EnvM2(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_2.txt"
         super().__init__(file_map)
+
 
 class CraftRM10EnvM3(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_3.txt"
         super().__init__(file_map)
 
+
 class CraftRM10EnvM4(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_4.txt"
         super().__init__(file_map)
+
 
 class CraftRM10EnvM5(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_5.txt"
         super().__init__(file_map)
 
+
 class CraftRM10EnvM6(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_6.txt"
         super().__init__(file_map)
+
 
 class CraftRM10EnvM7(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_7.txt"
         super().__init__(file_map)
 
+
 class CraftRM10EnvM8(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_8.txt"
         super().__init__(file_map)
+
 
 class CraftRM10EnvM9(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_9.txt"
         super().__init__(file_map)
 
+
 class CraftRM10EnvM10(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_10.txt"
         super().__init__(file_map)
-

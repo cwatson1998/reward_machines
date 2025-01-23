@@ -20,6 +20,7 @@ import envs
 from envs.water.water_world import Ball, BallAgent
 from reward_machines.rm_environment import RewardMachineWrapper
 from cmd_util import make_vec_env, make_env, common_arg_parser
+from client import GymClient
 
 try:
     from mpi4py import MPI
@@ -70,7 +71,8 @@ def train(args, extra_args):
 
     env = build_env(args)
     if args.save_video_interval != 0:
-        env = VecVideoRecorder(env, osp.join(logger.get_dir(), "videos"), record_video_trigger=lambda x: x % args.save_video_interval == 0, video_length=args.save_video_length)
+        env = VecVideoRecorder(env, osp.join(logger.get_dir(), "videos"), record_video_trigger=lambda x: x %
+                               args.save_video_interval == 0, video_length=args.save_video_length)
 
     if args.network:
         alg_kwargs['network'] = args.network
@@ -79,11 +81,12 @@ def train(args, extra_args):
             alg_kwargs['network'] = get_default_network(env_type)
 
     # Adding RM-related parameters
-    alg_kwargs['use_rs']   = args.use_rs
-    alg_kwargs['use_crm']  = args.use_crm
-    alg_kwargs['gamma']    = args.gamma
+    alg_kwargs['use_rs'] = args.use_rs
+    alg_kwargs['use_crm'] = args.use_crm
+    alg_kwargs['gamma'] = args.gamma
 
-    print('Training {} on {}:{} with arguments \n{}'.format(args.alg, env_type, env_id, alg_kwargs))
+    print('Training {} on {}:{} with arguments \n{}'.format(
+        args.alg, env_type, env_id, alg_kwargs))
 
     model = learn(
         env=env,
@@ -97,7 +100,8 @@ def train(args, extra_args):
 
 def build_env(args):
     ncpu = multiprocessing.cpu_count()
-    if sys.platform == 'darwin': ncpu //= 2
+    if sys.platform == 'darwin':
+        ncpu //= 2
     nenv = args.num_env or ncpu
     alg = args.alg
     seed = args.seed
@@ -105,16 +109,18 @@ def build_env(args):
     env_type, env_id = get_env_type(args)
 
     if alg in ['deepq', 'qlearning', 'hrm', 'dhrm']:
-        env = make_env(env_id, env_type, args, seed=seed, logger_dir=logger.get_dir())
+        env = make_env(env_id, env_type, args, seed=seed,
+                       logger_dir=logger.get_dir())
     else:
         config = tf.ConfigProto(allow_soft_placement=True,
-                               intra_op_parallelism_threads=1,
-                               inter_op_parallelism_threads=1)
+                                intra_op_parallelism_threads=1,
+                                inter_op_parallelism_threads=1)
         config.gpu_options.allow_growth = True
         get_session(config=config)
 
         flatten_dict_observations = alg not in {'her'}
-        env = make_vec_env(env_id, env_type, args.num_env or 1, seed, args, reward_scale=args.reward_scale, flatten_dict_observations=flatten_dict_observations)
+        env = make_vec_env(env_id, env_type, args.num_env or 1, seed, args,
+                           reward_scale=args.reward_scale, flatten_dict_observations=flatten_dict_observations)
 
         if env_type == 'mujoco':
             env = VecNormalize(env, use_tf=True)
@@ -144,7 +150,8 @@ def get_env_type(args):
                 break
         if ':' in env_id:
             env_type = re.sub(r':.*', '', env_id)
-        assert env_type is not None, 'env_id {} is not recognized in env types'.format(env_id, _game_envs.keys())
+        assert env_type is not None, 'env_id {} is not recognized in env types'.format(
+            env_id, _game_envs.keys())
 
     return env_type, env_id
 
@@ -154,6 +161,7 @@ def get_default_network(env_type):
         return 'cnn'
     else:
         return 'mlp'
+
 
 def get_alg_module(alg, submodule=None):
     library = 'rl_agents'
@@ -181,7 +189,6 @@ def get_learn_function_defaults(alg, env_type):
     return kwargs
 
 
-
 def parse_cmdline_kwargs(args):
     '''
     convert a list of '='-spaced command-line arguments to a dictionary, evaluating python objects when possible
@@ -194,7 +201,7 @@ def parse_cmdline_kwargs(args):
         except (NameError, SyntaxError):
             return v
 
-    return {k: parse(v) for k,v in parse_unknown_args(args).items()}
+    return {k: parse(v) for k, v in parse_unknown_args(args).items()}
 
 
 def configure_logger(log_path, **kwargs):
@@ -228,13 +235,15 @@ def main(args):
         logger.log("Running trained model")
         obs = env.reset()
 
-        state = model.initial_state if hasattr(model, 'initial_state') else None
+        state = model.initial_state if hasattr(
+            model, 'initial_state') else None
         dones = np.zeros((1,))
 
-        episode_rew = np.zeros(env.num_envs) if isinstance(env, VecEnv) else np.zeros(1)
+        episode_rew = np.zeros(env.num_envs) if isinstance(
+            env, VecEnv) else np.zeros(1)
         while True:
             if state is not None:
-                actions, _, state, _ = model.step(obs,S=state, M=dones)
+                actions, _, state, _ = model.step(obs, S=state, M=dones)
             else:
                 actions, _, _, _ = model.step(obs)
 
@@ -251,22 +260,23 @@ def main(args):
 
     return model
 
+
 if __name__ == '__main__':
 
     # Examples over the office world:
-    #    cross-product baseline: 
-    #        >>> python3.6 run.py --alg=qlearning --env=Office-v0 --num_timesteps=1e5 --gamma=0.9 
-    #    cross-product baseline with reward shaping: 
+    #    cross-product baseline:
+    #        >>> python3.6 run.py --alg=qlearning --env=Office-v0 --num_timesteps=1e5 --gamma=0.9
+    #    cross-product baseline with reward shaping:
     #        >>> python3.6 run.py --alg=qlearning --env=Office-v0 --num_timesteps=1e5 --gamma=0.9 --use_rs
-    #    CRM: 
+    #    CRM:
     #        >>> python3.6 run.py --alg=qlearning --env=Office-v0 --num_timesteps=1e5 --gamma=0.9 --use_crm
-    #    CRM with reward shaping: 
+    #    CRM with reward shaping:
     #        >>> python3.6 run.py --alg=qlearning --env=Office-v0 --num_timesteps=1e5 --gamma=0.9 --use_crm --use_rs
-    #    HRM: 
+    #    HRM:
     #        >>> python3.6 run.py --alg=hrm --env=Office-v0 --num_timesteps=1e5 --gamma=0.9
-    #    HRM with reward shaping: 
+    #    HRM with reward shaping:
     #        >>> python3.6 run.py --alg=hrm --env=Office-v0 --num_timesteps=1e5 --gamma=0.9 --use_rs
-    # NOTE: The complete list of experiments (that we reported in the paper) can be found on '../scripts' 
+    # NOTE: The complete list of experiments (that we reported in the paper) can be found on '../scripts'
 
     import time
     t_init = time.time()

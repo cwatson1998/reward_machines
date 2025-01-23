@@ -6,6 +6,7 @@ import numpy as np
 from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
 from reward_machines.rm_environment import RewardMachineEnv
 
+
 class MyHalfCheetahEnv(gym.Wrapper):
     def __init__(self):
         # Note that the current position is key for our tasks
@@ -20,27 +21,29 @@ class MyHalfCheetahEnv(gym.Wrapper):
     def get_events(self):
         events = ''
         if self.info['x_position'] < -10:
-            events+='b'
+            events += 'b'
         if self.info['x_position'] > 10:
-            events+='a'
+            events += 'a'
         if self.info['x_position'] < -2:
-            events+='d'
+            events += 'd'
         if self.info['x_position'] > 2:
-            events+='c'
+            events += 'c'
         if self.info['x_position'] > 4:
-            events+='e'
+            events += 'e'
         if self.info['x_position'] > 6:
-            events+='f'
+            events += 'f'
         if self.info['x_position'] > 8:
-            events+='g'
+            events += 'g'
         return events
 
 
 class MyHalfCheetahEnvRM1(RewardMachineEnv):
     def __init__(self):
+        # This is the place where it would be good to splice.
         env = MyHalfCheetahEnv()
         rm_files = ["./envs/mujoco_rm/reward_machines/t1.txt"]
         super().__init__(env, rm_files)
+
 
 class MyHalfCheetahEnvRM2(RewardMachineEnv):
     def __init__(self):

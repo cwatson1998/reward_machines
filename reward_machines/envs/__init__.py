@@ -14,11 +14,10 @@ register(
 )
 
 
-
 # ----------------------------------------- WATER
 for i in range(11):
-    w_id = 'Water-M%d-v0'%i
-    w_en = 'envs.water.water_environment:WaterRMEnvM%d'%i
+    w_id = 'Water-M%d-v0' % i
+    w_en = 'envs.water.water_environment:WaterRMEnvM%d' % i
     register(
         id=w_id,
         entry_point=w_en,
@@ -26,8 +25,8 @@ for i in range(11):
     )
 
 for i in range(11):
-    w_id = 'Water-single-M%d-v0'%i
-    w_en = 'envs.water.water_environment:WaterRM10EnvM%d'%i
+    w_id = 'Water-single-M%d-v0' % i
+    w_en = 'envs.water.water_environment:WaterRM10EnvM%d' % i
     register(
         id=w_id,
         entry_point=w_en,
@@ -42,6 +41,12 @@ register(
 )
 
 register(
+    id='Office-v0-remote',
+    entry_point='envs.grids.grid_environment:OfficeRMEnvRemote',
+    max_episode_steps=1000
+)
+
+register(
     id='Office-single-v0',
     entry_point='envs.grids.grid_environment:OfficeRM3Env',
     max_episode_steps=1000
@@ -49,8 +54,8 @@ register(
 
 # ----------------------------------------- CRAFT
 for i in range(11):
-    w_id = 'Craft-M%d-v0'%i
-    w_en = 'envs.grids.grid_environment:CraftRMEnvM%d'%i
+    w_id = 'Craft-M%d-v0' % i
+    w_en = 'envs.grids.grid_environment:CraftRMEnvM%d' % i
     register(
         id=w_id,
         entry_point=w_en,
@@ -58,8 +63,8 @@ for i in range(11):
     )
 
 for i in range(11):
-    w_id = 'Craft-single-M%d-v0'%i
-    w_en = 'envs.grids.grid_environment:CraftRM10EnvM%d'%i
+    w_id = 'Craft-single-M%d-v0' % i
+    w_en = 'envs.grids.grid_environment:CraftRM10EnvM%d' % i
     register(
         id=w_id,
         entry_point=w_en,
