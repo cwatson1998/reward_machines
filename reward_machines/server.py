@@ -112,6 +112,7 @@ class GymServer():
                     assert self.env is not None, "Need to make env first"
                     self.env.close()
                     response = {'status': 'closed'}
+
                 else:
                     response = {'error': 'Unknown command'}
 

@@ -75,6 +75,7 @@ class GymClient:
     def step(self, action):
         response = self.send_command('step', action=action)
         # The info field that we return needs to have any data that is needed for recreating the reward function.
+        raise NotImplementedError("chris")
         print(response['info'])
         return response['obs'], response['reward'], response['done'], response['info']
 
