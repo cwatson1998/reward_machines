@@ -41,7 +41,7 @@ register(
 )
 
 register(
-    id='Office-v0-remote',
+    id='Office-remote-v0',
     entry_point='envs.grids.grid_environment:OfficeRMEnvRemote',
     max_episode_steps=1000
 )
