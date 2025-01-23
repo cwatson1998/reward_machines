@@ -7,6 +7,10 @@ from collections import defaultdict
 import tensorflow as tf
 import numpy as np
 
+import socket
+import pickle
+
+
 from baselines.common.vec_env import VecFrameStack, VecNormalize, VecEnv
 from baselines.common.vec_env.vec_video_recorder import VecVideoRecorder
 from baselines.common.cmd_util import parse_unknown_args
@@ -19,26 +23,12 @@ from importlib import import_module
 import envs
 from envs.water.water_world import Ball, BallAgent
 from reward_machines.rm_environment import RewardMachineWrapper
+from reward_machines.envs.grids.office_world import OfficeWorld
+from reward_machines.envs.grids.grid_environment import GridEnv
 from cmd_util import make_vec_env, make_env, common_arg_parser
 from client import GymClient
 
-import sys
-import os.path as osp
-from collections import defaultdict
-import numpy as np
-
-from importlib import import_module
-
-
-import socket
-import gym
-import pickle
-import numpy as np
-import sys
-from importlib import import_module
-from cmd_util import make_env
-from reward_machines.envs.grids.office_world import OfficeWorld
-from reward_machines.envs.grids.grid_environment import GridEnv
+# below this line is bad stuff
 
 
 class GymServer:
