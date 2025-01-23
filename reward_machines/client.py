@@ -51,6 +51,7 @@ class GymClient:
         self.metadata = {'render.modes': []}
         self.reward_range = (-float('inf'), float('inf'))
         self.spec = None
+        self.unwrapped = self
 
     def get_events(self):
         response = self.send_command('get_events')
