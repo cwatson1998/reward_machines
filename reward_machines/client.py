@@ -28,6 +28,10 @@ class GymClient:
     def make(self, name):
         self.send_command("make", name=name)
 
+    def get_events(self):
+        response = self.send_command('get_events')
+        return response['events']
+
     # def make(self, **kwargs):
     #     """ Must pass all positional args as kwargs also. """
     #     self.send_command("make", **kwargs)
@@ -47,16 +51,16 @@ class GymClient:
         print("Closed connection to server")
 
 
-if __name__ == "__main__":
-    client = GymClient()
-    obs = client.reset()
+# if __name__ == "__main__":
+#     client = GymClient()
+#     obs = client.reset()
 
-    for _ in range(100):
-        action = np.random.choice([0, 1])  # Random action for CartPole
-        obs, reward, done, info = client.step(bool(action))
-        print(f"Observation: {obs}, Reward: {reward}, Done: {done}")
+#     for _ in range(100):
+#         action = np.random.choice([0, 1])  # Random action for CartPole
+#         obs, reward, done, info = client.step(bool(action))
+#         print(f"Observation: {obs}, Reward: {reward}, Done: {done}")
 
-        if done:
-            break
+#         if done:
+#             break
 
-    client.close()
+#     client.close()

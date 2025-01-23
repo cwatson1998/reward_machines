@@ -59,17 +59,28 @@ class GymServer:
                     #     print("Making env returned None")
                     #     self.conn.close()
                     # response = {'ok': True}
-                if message['command'] == 'reset':
+                elif message['command'] == 'get_events':
                     assert self.env is not None, "Need to make env first"
-                    obs, info = self.env.reset()
-                    response = {'obs': obs, 'info': info}
+                    # Propositions are returned as strings
+                    message = {'events': self.env.get_events()}
+
+                elif message['command'] == 'reset':
+                    assert self.env is not None, "Need to make env first"
+                    # obs, info = self.env.reset()
+                    # response = {'obs': obs, 'info': info}
+                    obs = self.env.reset()
+                    response = {'obs': obs}
                 elif message['command'] == 'step':
                     assert self.env is not None, "Need to make env first"
                     action = message['action']
-                    obs, reward, terminate, truncate, info = self.env.step(
+                    obs, reward, done, info = self.env.step(
                         action)
                     response = {'obs': obs, 'reward': reward,
-                                'terminate': terminate, 'truncate': truncate, 'info': info}
+                                'done': done, 'info': info}
+                    # obs, reward, terminate, truncate, info = self.env.step(
+                    #     action)
+                    # response = {'obs': obs, 'reward': reward,
+                    #             'terminate': terminate, 'truncate': truncate, 'info': info}
                 elif message['command'] == 'close':
                     assert self.env is not None, "Need to make env first"
                     self.env.close()
