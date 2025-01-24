@@ -90,6 +90,7 @@ def make_env(env_id, env_type, args, mpi_rank=0, subrank=0, seed=None, reward_sc
 
     # Adding RM wrappers if needed
     if args.alg.endswith("hrm") or args.alg.endswith("dhrm"):
+        print("We are about to try to apply the HRM wrapper.")
         env = HierarchicalRMWrapper(
             env, args.r_min, args.r_max, args.use_self_loops, args.use_rs, args.gamma, args.rs_gamma)
 
@@ -121,7 +122,7 @@ def common_arg_parser():
     """
     parser = arg_parser()
     parser.add_argument(
-        '--remote', help='Chris. "rm" to expect a reward_machines server.', type=str, default=None)
+        '--remote', help='Chris. "rm" to expect a reward_machines server. Lol actually I got rid of this.', type=str, default=None)
     parser.add_argument('--env', help='environment ID',
                         type=str, default='Reacher-v2')
     parser.add_argument(

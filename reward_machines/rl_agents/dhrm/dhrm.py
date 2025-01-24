@@ -82,10 +82,13 @@ def learn(env,
     set_global_seeds(seed)
 
     controller  = ControllerDQN(env, **controller_kargs)
+
+    
     if use_ddpg:
         options = OptionDDPG(env, gamma, total_timesteps, **option_kargs)
     else:
         options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
+        
     option_s    = None # State where the option initiated
     option_id   = None # Id of the current option being executed
     option_rews = []   # Rewards obtained by the current option
