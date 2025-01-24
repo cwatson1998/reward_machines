@@ -76,11 +76,13 @@ class GymClient:
         return response['obs']
 
     def step(self, action):
-        print("action")
-        print(action)
-        print(type(action))
-        print(action.shape)
-        print(self.action_space)
+        # For some reason, it seems to send shape (1,N) when it should be (N,).
+        # I flatten it on the other side.
+        # print("action")
+        # print(action)
+        # print(type(action))
+        # print(action.shape)
+        # print(self.action_space)
         response = self.send_command('step', action=action)
         # The info field that we return needs to have any data that is needed for recreating the reward function.
         # raise NotImplementedError("chris")
