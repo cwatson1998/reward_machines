@@ -13,8 +13,8 @@ def space_from_dict(construction_dict):
         else:
             # I learned that Gym spaces can consume things like "float32" or "uint8"
             kwargs['dtype'] = construction_dict['space_dtype']
-            raise NotImplementedError(
-                "A space_construction_dict provided the unknown dtype "+str(construction_dict['space_dtype']))
+            # raise NotImplementedError(
+            #     "A space_construction_dict provided the unknown dtype "+str(construction_dict['space_dtype']))
     # Now kwargs includes the dtype.
     if construction_dict['space_type'] == 'Discrete':
         return spaces.Discrete(*args, **kwargs)
