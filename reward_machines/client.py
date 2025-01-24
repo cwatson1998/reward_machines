@@ -11,6 +11,8 @@ def space_from_dict(construction_dict):
         if construction_dict['space_dtype'] == 'np.uint8':
             kwargs['dtype'] = np.uint8
         else:
+            # I learned that Gym spaces can consume things like "float32" or "uint8"
+            kwargs['dtype'] = construction_dict['space_dtype']
             raise NotImplementedError(
                 "A space_construction_dict provided the unknown dtype "+str(construction_dict['space_dtype']))
     # Now kwargs includes the dtype.
@@ -61,7 +63,7 @@ class GymClient:
     def get_events(self):
         # This is too much ipc. I should send the events along with every step and reset.
         response = self.send_command('get_events')
-        print(response['events'])
+        # print(response['events'])
         return response['events']
 
     # def make(self, **kwargs):

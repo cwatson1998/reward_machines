@@ -70,3 +70,10 @@ for i in range(11):
         entry_point=w_en,
         max_episode_steps=1000
     )
+
+# ----------------------------------------- ILG-Learn
+register(
+    id='diag3x3-sparse-v0',
+    entry_point='envs.ilg_rm.ilg_environment:MyDiag3x3SparseEnv',
+    max_episode_steps=1000,
+)
