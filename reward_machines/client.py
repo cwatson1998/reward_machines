@@ -76,6 +76,11 @@ class GymClient:
         return response['obs']
 
     def step(self, action):
+        print("action")
+        print(action)
+        print(type(action))
+        print(action.shape)
+        print(self.observation_space)
         response = self.send_command('step', action=action)
         # The info field that we return needs to have any data that is needed for recreating the reward function.
         # raise NotImplementedError("chris")
