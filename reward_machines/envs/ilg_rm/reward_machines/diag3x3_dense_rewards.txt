@@ -1,0 +1,6 @@
+0 # initial state
+[2] # terminal state
+(0,0,'z',IlgVertexRewardFunction(0))
+(0,1,'a',IlgVertexRewardFunction(0))
+(1,1,'z',IlgVertexRewardFunction(1))
+(1,2,'b',IlgVertexRewardFunction(1))

@@ -65,3 +65,18 @@ class RewardBackwards(RewardFunction):
 
     def get_reward(self, s_info):
         return -s_info['reward_run'] + s_info['reward_ctrl']  #Cheetah
+    
+
+class IlgVertexRewardFunction(RewardFunction):
+    """
+    Defines a constant reward for a 'simple reward machine'
+    """
+    def __init__(self, source_vertex_index):
+        super().__init__()
+        self.source_vertex_index = source_vertex_index
+
+    def get_type(self):
+        return f"IlgVertexReward{self.source_vertex_index}"
+
+    def get_reward(self, s_info):
+        return s_info['reward_value_array'][self.source_vertex_index]

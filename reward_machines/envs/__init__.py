@@ -75,5 +75,11 @@ for i in range(11):
 register(
     id='diag3x3-sparse-v0',
     entry_point='envs.ilg_rm.ilg_environment:MyDiag3x3SparseEnv',
-    max_episode_steps=1000,
+    max_episode_steps=600,
+)
+
+register(
+    id='diag3x3-dense-v0',
+    entry_point='envs.ilg_rm.ilg_environment:MyDiag3x3DenseEnv',
+    max_episode_steps=600,
 )

@@ -36,3 +36,11 @@ class MyDiag3x3SparseEnv(IlgRMEnv):
         env.make("point_maze-3x3-diagonal-one-sparse-10goals")
         rm_files = ["./envs/ilg_rm/reward_machines/diag3x3_sparse_rewards.txt"]
         super().__init__(env, rm_files)
+
+class MyDiag3x3SparseEnv(IlgRMEnv):
+    def __init__(self):
+        # Set this up using IPC. The thing on the
+        env = GymClient()
+        env.make("point_maze-3x3-diagonal-one-sparse-10goals")
+        rm_files = ["./envs/ilg_rm/reward_machines/diag3x3_dense_rewards.txt"]
+        super().__init__(env, rm_files)
