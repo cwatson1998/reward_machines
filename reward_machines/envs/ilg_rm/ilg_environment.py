@@ -37,7 +37,7 @@ class MyDiag3x3SparseEnv(IlgRMEnv):
         rm_files = ["./envs/ilg_rm/reward_machines/diag3x3_sparse_rewards.txt"]
         super().__init__(env, rm_files)
 
-class MyDiag3x3SparseEnv(IlgRMEnv):
+class MyDiag3x3DenseEnv(IlgRMEnv):
     def __init__(self):
         # Set this up using IPC. The thing on the
         env = GymClient()
