@@ -5,6 +5,7 @@ import tensorflow as tf
 import zipfile
 import cloudpickle
 import numpy as np
+import time
 
 import baselines.common.tf_util as U
 from baselines.common.tf_util import load_variables, save_variables
@@ -77,8 +78,6 @@ def learn(env,
         Wrapper over act function. Adds ability to save it and load it.
         See header of baselines/deepq/categorical.py for details on the act function.
     """
-    print(f"debug: {others}")
-    print(f"debug: {others.keys()}")
     wandb.init(project=others['wandb_project'],
                name=others['wandb_name'],
                entity=others['wandb_entity'],
@@ -117,12 +116,14 @@ def learn(env,
     episode_data_lists = {e: [] for e in tracked_events}
     episode_data_lists['best_dense'] = []
     episode_data_lists['best_is_success'] = []
+    episode_data_lists['ep_len'] = []
     episode_data_lists['missing_data'] = []
     def prepare_episode_data_lists_for_new_episode():
         for e in tracked_events:
             episode_data_lists[e].append(0)
         episode_data_lists['best_dense'].append(-9999)
         episode_data_lists['best_is_success'].append(0)
+        episode_data_lists['ep_len'].append(0)
         episode_data_lists['missing_data'].append(0)
     def update_episode_data_lists(info):
         try:
@@ -137,6 +138,10 @@ def learn(env,
             episode_data_lists['missing_data'][-1] = 1
         try:
             episode_data_lists['best_is_success'][-1] = max(episode_data_lists['best_is_success'][-1], info['is_success'])
+        except AttributeError:
+            episode_data_lists['missing_data'][-1] = 1
+        try:
+            episode_data_lists['ep_len'][-1] += 1
         except AttributeError:
             episode_data_lists['missing_data'][-1] = 1
     prepare_episode_data_lists_for_new_episode()
@@ -206,6 +211,7 @@ def learn(env,
 
             obs = new_obs
             episode_rewards[-1] += rew
+            print(f"debug info {info}")
             update_episode_data_lists(info)
             
             
