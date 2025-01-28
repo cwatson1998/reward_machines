@@ -85,6 +85,12 @@ def train(args, extra_args):
     alg_kwargs['use_crm'] = args.use_crm
     alg_kwargs['gamma'] = args.gamma
 
+    if args.alg == 'dhrm':
+        print("Adding Chris' args")
+        alg_kwargs['wandb_name'] = args.wandb_name
+        alg_kwargs['wandb_entity'] = args.wandb_entity
+        alg_kwargs['wandb_tag'] = args.wandb_tag
+
     print('Training {} on {}:{} with arguments \n{}'.format(
         args.alg, env_type, env_id, alg_kwargs))
 

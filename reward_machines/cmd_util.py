@@ -121,8 +121,15 @@ def common_arg_parser():
     Create an argparse.ArgumentParser.
     """
     parser = arg_parser()
-    parser.add_argument(
-        '--remote', help='Chris. "rm" to expect a reward_machines server. Lol actually I got rid of this.', type=str, default=None)
+    
+    parser.add_argument('--wandb_name', help='wandb_project',
+                        type=str, default=None)
+    parser.add_argument('--wandb_entity', help='wandb_entity',
+                        type=str, default='penn-pal')
+    parser.add_argument('--wandb_project', help='wandb_project',
+                        type=str, default='pdirl')
+    parser.add_argument('--wandb_tag', help='wandb_tag',
+                        type=str, default=None)
     parser.add_argument('--env', help='environment ID',
                         type=str, default='Reacher-v2')
     parser.add_argument(

@@ -22,6 +22,7 @@ from baselines.deepq.models import build_q_func
 from rl_agents.dhrm.options import OptionDQN, OptionDDPG
 from rl_agents.dhrm.controller import ControllerDQN
 
+import wandb
 
 def learn(env,
           use_ddpg=False,
@@ -76,6 +77,23 @@ def learn(env,
         Wrapper over act function. Adds ability to save it and load it.
         See header of baselines/deepq/categorical.py for details on the act function.
     """
+
+    wandb.init(project=others['wandb_project'],
+               name=others['wandb_name'],
+               entity=others['wandb_entity'],
+            #    id=None, 
+            #    resume =False
+               tags=[others['wandb_tag']] if others['wandb_tag'] is not None else None)
+    wandb.config.update(dict(
+          use_ddpg=use_ddpg,
+          gamma=gamma,
+          use_rs=use_rs,
+          seed=seed,
+          total_timesteps=total_timesteps,
+          print_freq=print_freq,
+          checkpoint_path=checkpoint_path,
+          checkpoint_freq=checkpoint_freq,
+          load_path=load_path))
     # Create all the functions necessary to train the model
 
     sess = get_session()
@@ -130,6 +148,8 @@ def learn(env,
             action = options.get_action(env.get_option_observation(option_id), t, reset)
             reset = False
             new_obs, rew, done, info = env.step(action)
+            print("Debug. info is")
+            print(info)
 
             # Saving the real reward that the option is getting
             if use_rs:
@@ -174,6 +194,13 @@ def learn(env,
                 logger.record_tabular("episodes", num_episodes)
                 logger.record_tabular("mean 100 episode reward", mean_100ep_reward)
                 logger.dump_tabular()
+                wandb_log_data = dict(
+                    custom_step=t,
+                    episodes=num_episodes,
+                    mean_100ep_reward=mean_100ep_reward,
+                )
+                # Log the prepared dictionary with the step
+                wandb.log(wandb_log_data, step=t)
 
             if (checkpoint_freq is not None and
                     num_episodes > 100 and t % checkpoint_freq == 0):
@@ -188,5 +215,6 @@ def learn(env,
             if print_freq is not None:
                 logger.log("Restored model with mean reward: {}".format(saved_mean_reward))
             #load_variables(model_file)
+        wandb.finish()
 
     return controller.act, options.act
