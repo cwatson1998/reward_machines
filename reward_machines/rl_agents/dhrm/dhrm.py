@@ -117,6 +117,7 @@ def learn(env,
     episode_data_lists['best_dense'] = []
     episode_data_lists['best_is_success'] = []
     episode_data_lists['ep_len'] = []
+    episode_data_lists['option_transitions'] = []
     episode_data_lists['missing_data'] = []
     def prepare_episode_data_lists_for_new_episode():
         for e in tracked_events:
@@ -124,6 +125,7 @@ def learn(env,
         episode_data_lists['best_dense'].append(-9999)
         episode_data_lists['best_is_success'].append(0)
         episode_data_lists['ep_len'].append(0)
+        episode_data_lists['option_transitions'].append(0)
         episode_data_lists['missing_data'].append(0)
     def update_episode_data_lists(info):
         try:
@@ -175,12 +177,14 @@ def learn(env,
                 valid_options = env.get_valid_options()
                 option_s    = obs
                 option_id   = controller.get_action(option_s, valid_options)
+                episode_data_lists['option_transitions'][-1] += 1
                 option_rews = []
 
             # Take action and update exploration to the newest value
             action = options.get_action(env.get_option_observation(option_id), t, reset)
             reset = False
             new_obs, rew, done, info = env.step(action)
+            print(f"debug: in the loop we get done as {done}")
             
 
             # Saving the real reward that the option is getting
