@@ -113,6 +113,33 @@ def learn(env,
     option_rews = []   # Rewards obtained by the current option
 
     episode_rewards = [0.0]
+    tracked_events = ['a','b','c','d','e']
+    episode_data_lists = {e: [] for e in tracked_events}
+    episode_data_lists['best_dense'] = []
+    episode_data_lists['best_is_success'] = []
+    episode_data_lists['missing_data'] = []
+    def prepare_episode_data_lists_for_new_episode():
+        for e in tracked_events:
+            episode_data_lists[e].append[0]
+            episode_data_lists['best_dense'].append(-9999)
+            episode_data_lists['best_is_success'].append(0)
+            episode_data_lists['missing_data'].append(0)
+    def update_episode_data_lists(info):
+        try:
+            for e in tracked_events:
+                if e in info['events']:
+                    episode_data_lists[e][-1] = 1
+        except AttributeError:
+            episode_data_lists['missing_data'][-1] = 1
+        try:
+            episode_data_lists['best_dense'][-1] = max(episode_data_lists['best_dense'][-1], info['dense'])
+        except AttributeError:
+            episode_data_lists['missing_data'][-1] = 1
+        try:
+            episode_data_lists['best_is_success'][-1] = max(episode_data_lists['best_is_success'][-1], info['is_success'])
+        except AttributeError:
+            episode_data_lists['missing_data'][-1] = 1
+    prepare_episode_data_lists_for_new_episode()
     saved_mean_reward = None
     obs = env.reset()
     options.reset()
@@ -132,7 +159,7 @@ def learn(env,
             load_variables(load_path)
             logger.log('Loaded model from {}'.format(load_path))
 
-
+        
         for t in range(total_timesteps):
             if callback is not None:
                 if callback(locals(), globals()):
@@ -149,8 +176,7 @@ def learn(env,
             action = options.get_action(env.get_option_observation(option_id), t, reset)
             reset = False
             new_obs, rew, done, info = env.step(action)
-            print("Debug. info is")
-            print(info)
+            
 
             # Saving the real reward that the option is getting
             if use_rs:
@@ -180,11 +206,17 @@ def learn(env,
 
             obs = new_obs
             episode_rewards[-1] += rew
+            update_episode_data_lists(info)
+            
+            
+    
+            
 
             if done:
                 obs = env.reset()
                 options.reset()
                 episode_rewards.append(0.0)
+                prepare_episode_data_lists_for_new_episode()
                 reset = True
 
             # General stats
@@ -195,13 +227,16 @@ def learn(env,
                 logger.record_tabular("episodes", num_episodes)
                 logger.record_tabular("mean 100 episode reward", mean_100ep_reward)
                 logger.dump_tabular()
-                wandb_log_data = dict(
-                    custom_step=t,
-                    episodes=num_episodes,
-                    mean_100ep_reward=mean_100ep_reward,
-                )
+                # Compute mean over 100 items!!!!
+                episode_data_lists_100_means = {
+                    f"{k}_mean100": round(np.mean(v[-101:-1]), 1) for k,v in episode_data_lists
+                }
+                episode_data_lists['custom_step']=t
+                episode_data_lists['episodes']=num_episodes
+                episode_data_lists['mean_100ep_reward_hrm']=mean_100ep_reward
+
                 # Log the prepared dictionary with the step
-                wandb.log(wandb_log_data, step=t)
+                wandb.log(episode_data_lists_100_means, step=t)
 
             if (checkpoint_freq is not None and
                     num_episodes > 100 and t % checkpoint_freq == 0):
