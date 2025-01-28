@@ -21,6 +21,7 @@ class IlgRMEnv(RewardMachineEnv):
     def step(self, action):
         # executing the action in the environment
         next_obs, original_reward, env_done, info = super().step(action)
+        # print('debug IlgRmEnv')
         self.info = info
         return next_obs, original_reward, env_done, info
 

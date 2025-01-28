@@ -79,7 +79,7 @@ class RewardMachineEnv(gym.Wrapper):
     def step(self, action):
         # executing the action in the environment
         next_obs, original_reward, env_done, info = self.env.step(action)
-
+        
         # getting the output of the detectors and saving information for generating counterfactual experiences
         true_props = self.env.get_events()
         self.crm_params = self.obs, action, next_obs, env_done, true_props, info
@@ -91,7 +91,7 @@ class RewardMachineEnv(gym.Wrapper):
         # returning the result of this action
         done = rm_done or env_done
         rm_obs = self.get_observation(next_obs, self.current_rm_id, self.current_u_id, done)
-
+        # print(f'debug. RewardMachineEnv gets env_done {env_done}, rm_done {rm_done}')
         return rm_obs, rm_rew, done, info
 
     def get_observation(self, next_obs, rm_id, u_id, done):
@@ -278,6 +278,7 @@ class HierarchicalRMWrapper(gym.Wrapper):
 
         # executing the action in the environment
         rm_obs, rm_rew, done, info = self.env.step(action)
+        # print(f'debug: HierarchicalRMWrapper receives done as {done}')
 
         # adding crm if needed
         if self.add_rs:

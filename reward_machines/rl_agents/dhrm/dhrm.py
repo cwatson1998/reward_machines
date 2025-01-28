@@ -148,6 +148,7 @@ def learn(env,
             episode_data_lists['missing_data'][-1] = 1
     prepare_episode_data_lists_for_new_episode()
     saved_mean_reward = None
+    # print(f"debug type of env is {type(env)}")
     obs = env.reset()
     options.reset()
     reset = True
@@ -184,7 +185,7 @@ def learn(env,
             action = options.get_action(env.get_option_observation(option_id), t, reset)
             reset = False
             new_obs, rew, done, info = env.step(action)
-            print(f"debug: in the loop we get done as {done}")
+            # print(f"debug: in the loop we get done as {done}")
             
 
             # Saving the real reward that the option is getting
@@ -215,7 +216,7 @@ def learn(env,
 
             obs = new_obs
             episode_rewards[-1] += rew
-            print(f"debug info {info}")
+            # print(f"debug info {info}")
             update_episode_data_lists(info)
             
             

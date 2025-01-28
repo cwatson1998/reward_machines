@@ -87,7 +87,7 @@ class GymClient:
         # The info field that we return needs to have any data that is needed for recreating the reward function.
         # raise NotImplementedError("chris")
         # print(response['info'])
-        print('debug: client receives done as '+str(response['done']))
+        # print('debug: client receives done as '+str(response['done']))
         return response['obs'], response['reward'], response['done'], response['info']
 
     def close(self):
