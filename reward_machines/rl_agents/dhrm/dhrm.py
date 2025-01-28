@@ -120,10 +120,10 @@ def learn(env,
     episode_data_lists['missing_data'] = []
     def prepare_episode_data_lists_for_new_episode():
         for e in tracked_events:
-            episode_data_lists[e].append[0]
-            episode_data_lists['best_dense'].append(-9999)
-            episode_data_lists['best_is_success'].append(0)
-            episode_data_lists['missing_data'].append(0)
+            episode_data_lists[e].append(0)
+        episode_data_lists['best_dense'].append(-9999)
+        episode_data_lists['best_is_success'].append(0)
+        episode_data_lists['missing_data'].append(0)
     def update_episode_data_lists(info):
         try:
             for e in tracked_events:
@@ -227,16 +227,18 @@ def learn(env,
                 logger.record_tabular("episodes", num_episodes)
                 logger.record_tabular("mean 100 episode reward", mean_100ep_reward)
                 logger.dump_tabular()
+#                print(f"debug. we have {episode_data_lists}")
                 # Compute mean over 100 items!!!!
-                episode_data_lists_100_means = {
-                    f"{k}_mean100": round(np.mean(v[-101:-1]), 1) for k,v in episode_data_lists
+                wandb_log_dict = {
+                    f"{k}_mean100": round(np.mean(v[-101:-1]), 1) for k,v in episode_data_lists.items()
                 }
-                episode_data_lists['custom_step']=t
-                episode_data_lists['episodes']=num_episodes
-                episode_data_lists['mean_100ep_reward_hrm']=mean_100ep_reward
+                
+                wandb_log_dict['custom_step']=t
+                wandb_log_dict['episodes']=num_episodes
+                wandb_log_dict['mean_100ep_reward_hrm']=mean_100ep_reward
 
                 # Log the prepared dictionary with the step
-                wandb.log(episode_data_lists_100_means, step=t)
+                wandb.log(wandb_log_dict, step=t)
 
             if (checkpoint_freq is not None and
                     num_episodes > 100 and t % checkpoint_freq == 0):
