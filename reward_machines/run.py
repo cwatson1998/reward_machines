@@ -90,6 +90,7 @@ def train(args, extra_args):
         alg_kwargs['wandb_name'] = args.wandb_name
         alg_kwargs['wandb_entity'] = args.wandb_entity
         alg_kwargs['wandb_tag'] = args.wandb_tag
+        alg_kwargs['wandb_project'] = args.wandb_project
 
     print('Training {} on {}:{} with arguments \n{}'.format(
         args.alg, env_type, env_id, alg_kwargs))

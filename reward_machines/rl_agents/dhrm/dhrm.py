@@ -77,7 +77,8 @@ def learn(env,
         Wrapper over act function. Adds ability to save it and load it.
         See header of baselines/deepq/categorical.py for details on the act function.
     """
-
+    print(f"debug: {others}")
+    print(f"debug: {others.keys()}")
     wandb.init(project=others['wandb_project'],
                name=others['wandb_name'],
                entity=others['wandb_entity'],
