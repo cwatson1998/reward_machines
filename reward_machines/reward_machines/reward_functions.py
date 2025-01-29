@@ -80,3 +80,24 @@ class IlgVertexRewardFunction(RewardFunction):
 
     def get_reward(self, s_info):
         return s_info['reward_value_array'][self.source_vertex_index]
+    
+class IlgInfoRewardFunction(RewardFunction):
+    """
+    Defines a constant reward for a 'simple reward machine'
+    """
+    def __init__(self, source_vertex_index):
+        super().__init__()
+        self.source_vertex_index = source_vertex_index
+
+    def get_type(self):
+        return f"IlgInfoReward{self.source_vertex_index}"
+
+    def get_reward(self, s_info):
+        return s_info[f'r{self.source_vertex_index}']
+    
+
+
+
+
+
+

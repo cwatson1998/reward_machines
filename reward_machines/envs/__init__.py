@@ -83,3 +83,10 @@ register(
     entry_point='envs.ilg_rm.ilg_environment:MyDiag3x3DenseEnv',
     max_episode_steps=600,
 )
+
+
+register(
+    id='stackChoiceOutwardview-dense-v0',
+    entry_point='envs.ilg_rm.ilg_environment:MyStackChoiceOutwardviewEnv',
+    max_episode_steps=600,
+)
