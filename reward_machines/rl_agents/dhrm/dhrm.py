@@ -119,6 +119,8 @@ def learn(env,
     episode_data_lists['ep_len'] = []
     episode_data_lists['option_transitions'] = []
     episode_data_lists['missing_data'] = []
+    prev_time = time.time()
+    prev_t = 0
     def prepare_episode_data_lists_for_new_episode():
         for e in tracked_events:
             episode_data_lists[e].append(0)
@@ -247,7 +249,11 @@ def learn(env,
                 wandb_log_dict['custom_step']=t
                 wandb_log_dict['episodes']=num_episodes
                 wandb_log_dict['mean_100ep_reward_hrm']=mean_100ep_reward
-
+                cur_time = wandb.time()
+                wandb_log_dict['sps'] = (t - prev_t)/(cur_time - prev_time)
+                prev_t = t
+                prev_time = cur_time
+                
                 # Log the prepared dictionary with the step
                 wandb.log(wandb_log_dict, step=t)
 
