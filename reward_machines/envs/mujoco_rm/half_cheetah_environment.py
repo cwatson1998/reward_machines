@@ -1,10 +1,10 @@
 """
 This code add event detectors to the Ant3 Environment
 """
-import gym
-import numpy as np
-from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
-from reward_machines.rm_environment import RewardMachineEnv
+# import gym
+# import numpy as np
+# from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+# from reward_machines.rm_environment import RewardMachineEnv
 
 
 class MyHalfCheetahEnv(gym.Wrapper):
