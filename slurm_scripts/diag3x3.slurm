@@ -63,6 +63,17 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+# Function to find an available port in the range 5000-9999
+find_free_port() {
+    while :; do
+        PORT=$(( RANDOM % 5000 + 5000 ))  # Generate a port between 5000-9999
+        if ! lsof -i :$PORT >/dev/null; then
+            echo $PORT
+            return
+        fi
+    done
+}
+
 
 echo About to start running
 
@@ -81,11 +92,22 @@ do
     git rev-parse HEAD >> $TASK_LOG_DIR/head_commit_hash
 
 
-    
+        
+    # Get a free port
+    FREE_PORT=$(find_free_port)
+
+    echo "Random available port: $FREE_PORT"
+
 
 
     conda activate jax-conda-new
-    python ../../pdirl/server.py &
+
+    export MUJOCO_GL=egl
+    export CUDA_VISIBLE_DEVICES=0
+    export MUJOCO_EGL_DEVICE_ID=$CUDA_VISIBLE_DEVICES
+
+
+    python ../../pdirl/server.py $FREE_PORT &
     SERVER_PID=$!
     trap "echo 'SLURM job terminating, killing server (PID: $SERVER_PID)'; kill $SERVER_PID 2>/dev/null" SIGTERM SIGINT EXIT
 
@@ -95,6 +117,7 @@ do
 
     XLA_PYTHON_CLIENT_PREALLOCATE=false timeout --foreground $TIMEOUT python3 -u run.py \
         --wandb_experiment=$EXPERIMENT
+        --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \
         --wandb_entity=$WANDB_ENTITY \
         --env=$ENV \
