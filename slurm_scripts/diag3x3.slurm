@@ -14,8 +14,8 @@
 
 #SBATCH --partition=dineshj-compute
 #SBATCH --qos=dj-med
-#SBATCH --time=24:00:00
-TIMEOUT=24h
+#SBATCH --time=12:00:00
+TIMEOUT=12h
 
 ##SBATCH --partition=dineshj-compute
 ##SBATCH --qos=dj-high
@@ -45,8 +45,11 @@ OUT_DIR=outputs/$EXP_NAME
 
 # Added by chris:                                                                                                                                                                             
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/ccwatson/.mujoco/mujoco210/bin
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
-
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/chriswatson/.mujoco/mujoco210/bin
+# Not sure if this is good
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco200/bin
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -82,17 +85,19 @@ do
 
 
     
-
-
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
     conda activate jax-conda-new
     python ../../pdirl/server.py &
     SERVER_PID=$!
     trap "echo 'SLURM job terminating, killing server (PID: $SERVER_PID)'; kill $SERVER_PID 2>/dev/null" SIGTERM SIGINT EXIT
 
-    sleep 30
+    sleep 15
 
-    conda activate my-hrm
-
+    conda activate new-hrm
+export MUJOCO_GL=egl
+export PYOPENGL_PLATFORM=egl
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
     XLA_PYTHON_CLIENT_PREALLOCATE=false timeout --foreground $TIMEOUT python3 -u run.py \
         --wandb_experiment=$EXPERIMENT
         --wandb_name=$WANDB_NAME \
