@@ -116,7 +116,7 @@ do
     conda activate my-hrm
 
     XLA_PYTHON_CLIENT_PREALLOCATE=false timeout --foreground $TIMEOUT python3 -u run.py \
-        --wandb_experiment=$EXPERIMENT
+        --wandb_experiment=$EXPERIMENT \
         --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \
         --wandb_entity=$WANDB_ENTITY \
