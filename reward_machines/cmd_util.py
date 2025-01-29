@@ -78,7 +78,8 @@ def make_env(env_id, env_type, args, mpi_rank=0, subrank=0, seed=None, reward_sc
         module_name = re.sub(':.*', '', env_id)
         env_id = re.sub('.*:', '', env_id)
         importlib.import_module(module_name)
-
+    if args.port is not None:
+        env_kwargs['port'] = args.port
     env = gym.make(env_id, **env_kwargs)
     # Chris decided that he should actually splice his server in based on env name.
     # if args.remote is None:
@@ -121,7 +122,7 @@ def common_arg_parser():
     Create an argparse.ArgumentParser.
     """
     parser = arg_parser()
-    
+    parser.add_argument('--port', help='port (only used for ILG-Learn)', type=int, default=None)
     parser.add_argument('--wandb_name', help='wandb_project',
                         type=str, default=None)
     parser.add_argument('--wandb_entity', help='wandb_entity',
