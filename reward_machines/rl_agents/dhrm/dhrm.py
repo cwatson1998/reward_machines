@@ -249,7 +249,7 @@ def learn(env,
                 wandb_log_dict['custom_step']=t
                 wandb_log_dict['episodes']=num_episodes
                 wandb_log_dict['mean_100ep_reward_hrm']=mean_100ep_reward
-                cur_time = wandb.time()
+                cur_time = time.time()
                 wandb_log_dict['sps'] = (t - prev_t)/(cur_time - prev_time)
                 prev_t = t
                 prev_time = cur_time
