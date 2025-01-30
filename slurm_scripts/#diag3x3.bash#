@@ -1,5 +1,3 @@
-#!/bin/bash
-
 N_JOB=5
 FULL_ID="$RANDOM"
 echo the full id is $FULL_ID
@@ -67,7 +65,7 @@ do
 
     # scontrol write batch_script $SLURM_JOB_ID $TASK_LOG_DIR/sbatch.slurm >> $TASK_LOG_DIR/sbatch.slurm 2>&1
 
-    git rev-parse HEAD >> $TASK_LOG_DIR/head_commit_hash
+qq    git rev-parse HEAD >> $TASK_LOG_DIR/head_commit_hash
 
 
         
