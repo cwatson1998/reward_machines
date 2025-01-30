@@ -1,14 +1,14 @@
 #!/bin/bash
 
-N_JOB=1
+N_JOB=3
 FULL_ID="$RANDOM"
 echo the full id is $FULL_ID
 
 EXPERIMENT=pdirl
-ENV=stackChoiceOutwardview-dense-v0
+ENV=stack_twoblock_choice_50_examples_outwardview
 WANDB_ENTITY=penn-pal
 WANDB_NAME=debug_stackChoiceOutwardview
-WANDB_TAG=debug_hrm
+WANDB_TAG=hrm_stack_choice_outwardview
 
 # export MUJOCO_GL=egl
 # export CUDA_VISIBLE_DEVICES=0
@@ -88,7 +88,7 @@ do
     # export MUJOCO_EGL_DEVICE_ID=$CUDA_VISIBLE_DEVICES
 
 
-    /home/christopher/miniconda3/envs/pdirl/bin/python3 ../../pdirl/server.py $FREE_PORT > >(tee -a /dev/tty) 2> >(tee -a /dev/tty >&2) &
+    /home/christopher/miniconda3/envs/pdirl/bin/python3 ../../pdirl/server.py $FREE_PORT &
     SERVER_PID=$!
     trap "echo 'SLURM job terminating, killing server (PID: $SERVER_PID)'; kill $SERVER_PID 2>/dev/null" SIGTERM SIGINT EXIT
 
@@ -107,7 +107,8 @@ do
         --alg=dhrm \
         --log_path=$TASK_LOG_DIR \
         --r_max=100 \
-        2>&1 | tee $TASK_LOG_DIR/app.log
+        >> $TASK_LOG_DIR/app.log 2>&1
+        # 2>&1 | tee $TASK_LOG_DIR/app.log
         #>> $TASK_LOG_DIR/app.log 2>&1
         # Do not send this to the background. It is important for it to block.
         TRAIN_EXIT_CODE=$?
