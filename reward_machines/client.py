@@ -64,7 +64,7 @@ class GymClient:
         # This is too much ipc. I should send the events along with every step and reset.
         response = self.send_command('get_events')
         # print(f"debug. client receives events {response['events']}")
-        print(f'debug: gymclient sends events as {response["events"]}')
+        # print(f'debug: gymclient sends events as {response["events"]}')
         return response['events']
 
     # def make(self, **kwargs):
@@ -89,7 +89,7 @@ class GymClient:
         # raise NotImplementedError("chris")
         # print(response['info'])
         # print('debug: client receives done as '+str(response['done']))
-        print(f'debug: gymclient sends info as {response["info"]}')
+        # print(f'debug: gymclient sends info as {response["info"]}')
         return response['obs'], response['reward'], response['done'], response['info']
 
     def close(self):
