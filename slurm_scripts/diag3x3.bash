@@ -1,13 +1,12 @@
-
-N_JOB=1
+N_JOB=5
 FULL_ID="$RANDOM"
 echo the full id is $FULL_ID
 
 EXPERIMENT=pdirl
 ENV=diag3x3-dense-v0
 WANDB_ENTITY=penn-pal
-WANDB_NAME=pointmaze_slurm
-WANDB_TAG=delete_this
+WANDB_NAME=pointmaze_local
+WANDB_TAG=hrm_3x3
 
 # export MUJOCO_GL=egl
 # export CUDA_VISIBLE_DEVICES=0
@@ -80,21 +79,21 @@ do
     
 #    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
 #     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
-    conda activate pdirl
+#    conda activate pdirl
 
     # export MUJOCO_GL=egl
     # export CUDA_VISIBLE_DEVICES=0
     # export MUJOCO_EGL_DEVICE_ID=$CUDA_VISIBLE_DEVICES
 
 
-    python ../../pdirl/server.py $FREE_PORT &
+    /home/christopher/miniconda3/envs/pdirl/bin/python3 ../../pdirl/server.py $FREE_PORT &
     SERVER_PID=$!
     trap "echo 'SLURM job terminating, killing server (PID: $SERVER_PID)'; kill $SERVER_PID 2>/dev/null" SIGTERM SIGINT EXIT
 
     sleep 15
 
-    conda activate hrm
-    XLA_PYTHON_CLIENT_PREALLOCATE=false python3 -u run.py \
+ #   conda activate hrm
+    XLA_PYTHON_CLIENT_PREALLOCATE=false /home/christopher/miniconda3/envs/hrm/bin/python3 -u run.py \
         --wandb_experiment=$EXPERIMENT \
         --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \
@@ -115,7 +114,7 @@ do
         if ps -p $SERVER_PID > /dev/null; then
             kill -9 $SERVER_PID
         fi
-
+sleep 60
         
 done
 echo "Shutting down server process (PID: $SERVER_PID)"
