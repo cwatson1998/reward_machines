@@ -28,6 +28,7 @@ class GymClient:
         self.port = port
         self.client_socket = None
         self.connect_to_server()
+        self.cached_events = None
 
     def connect_to_server(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -62,6 +63,8 @@ class GymClient:
 
     def get_events(self):
         # This is too much ipc. I should send the events along with every step and reset.
+        if self.cached_events is not None:
+            return self.cached_events
         response = self.send_command('get_events')
         # print(f"debug. client receives events {response['events']}")
         # print(f'debug: gymclient sends events as {response["events"]}')
@@ -74,6 +77,7 @@ class GymClient:
 
     def reset(self):
         response = self.send_command('reset')
+        self.events = None
         return response['obs']
 
     def step(self, action):
@@ -85,6 +89,11 @@ class GymClient:
         # print(action.shape)
         # print(self.action_space)
         response = self.send_command('step', action=action)
+        try:
+            self.cached_events = response['info']['events']
+        except KeyError:
+            self.cached_events = None
+
         # The info field that we return needs to have any data that is needed for recreating the reward function.
         # raise NotImplementedError("chris")
         # print(response['info'])
