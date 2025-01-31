@@ -88,5 +88,12 @@ register(
 register(
     id='stackChoiceOutwardview-dense-v0',
     entry_point='envs.ilg_rm.ilg_environment:MyStackChoiceOutwardviewEnv',
-    max_episode_steps=600,
+    max_episode_steps=250,
+)
+
+
+register(
+    id='stackAB-dense-v0',
+    entry_point='envs.ilg_rm.ilg_environment:MyStackABEnv',
+    max_episode_steps=250,
 )

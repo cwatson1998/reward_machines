@@ -61,3 +61,15 @@ class MyStackChoiceOutwardviewEnv(IlgRMEnv):
         env.make("stack_twoblock_choice_50_examples_outwardview")
         rm_files = ["./envs/ilg_rm/reward_machines/stack_choice_outwardview.txt"]
         super().__init__(env, rm_files)
+
+
+class MyStackABEnv(IlgRMEnv):
+    def __init__(self, **kwargs):
+        # Set this up using IPC. The thing on the
+        
+        port = kwargs.get("port", 5000)
+        print("Got port as "+str(port))
+        env = GymClient(port=port)
+        env.make("stack_twoblock_A_B_50_examples")
+        rm_files = ["./envs/ilg_rm/reward_machines/stack_AB.txt"]
+        super().__init__(env, rm_files)
