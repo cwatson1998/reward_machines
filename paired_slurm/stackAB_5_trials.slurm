@@ -3,8 +3,8 @@
 #SBATCH --cpus-per-gpu=6
 #SBATCH --open-mode=append
 #SBATCH --job-name=pdirl
-#SBATCH --gpus=1
-#SBATCH --array=0
+#SBATCH --gres=gpu:1
+#SBATCH --array=0-4
 
 
 ##SBATCH --partition=batch
@@ -13,9 +13,10 @@
 #TIMEOUT=24h
 
 #SBATCH --partition=dineshj-compute
+#SBATCH --exclude=dj-2080ti-0.grasp.maas
 #SBATCH --qos=dj-med
-#SBATCH --time=24:00:00
-TIMEOUT=24h
+#SBATCH --time=12:00:00
+TIMEOUT=12h
 
 ##SBATCH --partition=dineshj-compute
 ##SBATCH --qos=dj-high
@@ -23,17 +24,18 @@ TIMEOUT=24h
 #TIMEOUT=24h
 
 
-
+/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/new-hrm/bin/wandb login
+echo finished wandb login
 
 N_JOB=1
 FULL_ID="${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 echo the full id is $FULL_ID
 
 EXPERIMENT=pdirl
-ENV=diag3x3-dense-v0
+ENV=stackAB-dense-v0
 WANDB_ENTITY=penn-pal
-WANDB_NAME=pointmaze_slurm
-WANDB_TAG=delete_this
+WANDB_NAME=hrm_stackAB_new
+WANDB_TAG=hrm_stackAB_new
 
 export MUJOCO_GL=egl
 export CUDA_VISIBLE_DEVICES=0
@@ -65,7 +67,7 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
+conda activate new-hrm
 # Function to find an available port in the range 5000-9999
 find_free_port() {
     while :; do
@@ -106,24 +108,26 @@ do
     
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
-    conda activate jax-conda-new
+    #conda activate jax-conda-new
 
     export MUJOCO_GL=egl
     export CUDA_VISIBLE_DEVICES=0
     export MUJOCO_EGL_DEVICE_ID=$CUDA_VISIBLE_DEVICES
 
 
-    python ../../pdirl/server.py $FREE_PORT &
+#    /mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/jax-conda-new/bin/python3 ../../pdirl/server.py $FREE_PORT &
+    /mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/jax-conda-new/bin/python3 ../../pdirl/server.py $FREE_PORT >$TASK_LOG_DIR/server.out 2>$TASK_LOG_DIR/server.err &
     SERVER_PID=$!
     trap "echo 'SLURM job terminating, killing server (PID: $SERVER_PID)'; kill $SERVER_PID 2>/dev/null" SIGTERM SIGINT EXIT
 
-    sleep 15
+    sleep 40
 
-    conda activate new-hrm
+    
     export MUJOCO_GL=egl
     export PYOPENGL_PLATFORM=egl
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
-    XLA_PYTHON_CLIENT_PREALLOCATE=false timeout --foreground $TIMEOUT python3 -u run.py \
+    /mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/new-hrm/bin/python3 -u run.py \
+        --vram_frac=0.8 \
         --wandb_experiment=$EXPERIMENT \
         --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \
@@ -134,9 +138,8 @@ do
         --gamma=0.99 \
         --alg=dhrm \
         --log_path=$TASK_LOG_DIR \
-        -r_max=100 \
+        -r_max=1000 \
         >> $TASK_LOG_DIR/app.log 2>&1
-        # Do not send this to the background. It is important for it to block.
         TRAIN_EXIT_CODE=$?
 
         echo "Shutting down server process (PID: $SERVER_PID)"
@@ -168,8 +171,8 @@ fi
 exit 0
 wait
 
-	#>> ${EXPERIMENT}_${ENV}_${SLURM_JOB_ID}.out
+
 echo All processes complete!
-#TODO - implement retry if job terminated (RL is robust; but planner state needs to be checkpointed and restored)
+
 
 exit 0

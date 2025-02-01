@@ -1,6 +1,6 @@
 0 # initial state
 [2] # terminal state
 (0,0,'!a',IlgInfoRewardFunction(4))
-(0,1,'a',IlgInfoRewardFunction(4))
+(0,1,'a',IlgInfoRewardFunction(1))
 (1,1,'!b',IlgInfoRewardFunction(1))
-(1,2,'b',IlgInfoRewardFunction(1))
+(1,2,'b',ConstantRewardFunction(1000))

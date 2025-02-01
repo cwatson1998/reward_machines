@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#SBATCH --mem-per-gpu=24G
-#SBATCH --cpus-per-gpu=8
+#SBATCH --mem-per-gpu=16G
+#SBATCH --cpus-per-gpu=6
 #SBATCH --open-mode=append
 #SBATCH --job-name=pdirl
 #SBATCH --gres=gpu:1
@@ -13,6 +13,7 @@
 #TIMEOUT=24h
 
 #SBATCH --partition=dineshj-compute
+#SBATCH --exclude=dj-2080ti-0.grasp.maas
 #SBATCH --qos=dj-med
 #SBATCH --time=12:00:00
 TIMEOUT=12h
