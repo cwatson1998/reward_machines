@@ -92,7 +92,10 @@ class GymClient:
         try:
             self.cached_events = response['info']['events']
         except KeyError:
-            self.cached_events = None
+            try:
+                self.cached_events = response['events']
+            except KeyError:
+                self.cached_events = None
 
         # The info field that we return needs to have any data that is needed for recreating the reward function.
         # raise NotImplementedError("chris")
