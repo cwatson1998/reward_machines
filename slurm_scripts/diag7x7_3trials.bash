@@ -1,6 +1,6 @@
 #!/bin/bash
 
-N_JOB=1
+N_JOB=3
 FULL_ID="$RANDOM"
 echo the full id is $FULL_ID
 
@@ -96,7 +96,7 @@ do
 
  #   conda activate hrm
     /home/christopher/miniconda3/envs/hrm/bin/python3 -u run.py \
-        --vram_frac=0.2 \
+        --vram_frac=0.19 \
         --wandb_experiment=$EXPERIMENT \
         --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \
