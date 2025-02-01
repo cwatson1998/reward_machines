@@ -126,7 +126,7 @@ do
     export PYOPENGL_PLATFORM=egl
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
     /mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/new-hrm/bin/python3 -u run.py \
-        --vram_frac=0.2
+        --vram_frac=0.2 \
         --wandb_experiment=$EXPERIMENT \
         --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \
