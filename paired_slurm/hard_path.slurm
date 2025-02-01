@@ -15,7 +15,7 @@
 #SBATCH --partition=dineshj-compute
 #SBATCH --qos=dj-med
 #SBATCH --nodelist=dj-a40-0.grasp.maas,dj-a40-1.grasp.maas,dj-l40-0.grasp.maas
-#SBATCH --time=14:00:00
+#SBATCH --time=12:00:00
 TIMEOUT=12h
 
 ##SBATCH --partition=dineshj-compute
