@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#SBATCH --mem-per-gpu=16G
-#SBATCH --cpus-per-gpu=6
+#SBATCH --mem-per-gpu=24G
+#SBATCH --cpus-per-gpu=8
 #SBATCH --open-mode=append
 #SBATCH --job-name=pdirl
 #SBATCH --gpus=1
@@ -14,7 +14,8 @@
 
 #SBATCH --partition=dineshj-compute
 #SBATCH --qos=dj-med
-#SBATCH --time=12:00:00
+#SBATCH --nodelist=dj-a40-0.grasp.maas,dj-a40-1.grasp.maas,dj-l40-0.grasp.maas
+#SBATCH --time=14:00:00
 TIMEOUT=12h
 
 ##SBATCH --partition=dineshj-compute
@@ -32,8 +33,8 @@ echo the full id is $FULL_ID
 EXPERIMENT=pdirl
 ENV=diag3x3-dense-v0
 WANDB_ENTITY=penn-pal
-WANDB_NAME=pointmaze_slurm
-WANDB_TAG=delete_this
+WANDB_NAME=pointmaze_slurm_serial
+WANDB_TAG=hrm-diag3x3
 
 export MUJOCO_GL=egl
 export CUDA_VISIBLE_DEVICES=0
@@ -114,18 +115,18 @@ do
 
 
 #    /mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/jax-conda-new/bin/python3 ../../pdirl/server.py $FREE_PORT &
-    /mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/jax-conda-new/bin/python3 ../../pdirl/server.py $FREE_PORT >server.out 2>server.err &
-
+    /mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/jax-conda-new/bin/python3 ../../pdirl/server.py $FREE_PORT >$TASK_LOG_DIR/server.out 2>$TASK_LOG_DIR/server.err &
     SERVER_PID=$!
     trap "echo 'SLURM job terminating, killing server (PID: $SERVER_PID)'; kill $SERVER_PID 2>/dev/null" SIGTERM SIGINT EXIT
 
-    sleep 60
+    sleep 40
 
     
     export MUJOCO_GL=egl
     export PYOPENGL_PLATFORM=egl
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
     /mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/new-hrm/bin/python3 -u run.py \
+        --vram_frac=0.2
         --wandb_experiment=$EXPERIMENT \
         --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \
@@ -138,7 +139,6 @@ do
         --log_path=$TASK_LOG_DIR \
         -r_max=100 \
         >> $TASK_LOG_DIR/app.log 2>&1
-        # Do not send this to the background. It is important for it to block.
         TRAIN_EXIT_CODE=$?
 
         echo "Shutting down server process (PID: $SERVER_PID)"
@@ -170,8 +170,8 @@ fi
 exit 0
 wait
 
-	#>> ${EXPERIMENT}_${ENV}_${SLURM_JOB_ID}.out
+
 echo All processes complete!
-#TODO - implement retry if job terminated (RL is robust; but planner state needs to be checkpointed and restored)
+
 
 exit 0
