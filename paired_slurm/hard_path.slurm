@@ -23,7 +23,8 @@ TIMEOUT=12h
 #TIMEOUT=24h
 
 
-
+/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/envs/new-hrm/bin/wandb login
+echo finished wandb login
 
 N_JOB=1
 FULL_ID="${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
