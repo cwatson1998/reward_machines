@@ -3,7 +3,7 @@
 #SBATCH --cpus-per-gpu=8
 #SBATCH --open-mode=append
 #SBATCH --job-name=pdirl
-#SBATCH --gpus=1
+#SBATCH --gres=gpu:1
 #SBATCH --array=0
 
 
