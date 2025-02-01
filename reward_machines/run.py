@@ -269,6 +269,10 @@ def main(args):
 
 
 if __name__ == '__main__':
+    print("experimentally trying to grab moer vram")
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)  # 4.8GB on 24GB GPU
+    config = tf.ConfigProto(gpu_options=gpu_options)
+    sess = tf.Session(config=config)
 
     # Examples over the office world:
     #    cross-product baseline:
