@@ -11,4 +11,4 @@
 (4,4,'!e',IlgVertexRewardFunction(4))
 (4,5,'e',IlgVertexRewardFunction(4))
 (5,5,'!f',IlgVertexRewardFunction(5))
-(5,6,'f',IlgVertexRewardFunction(5))
+(5,6,'f',ConstantRewardFunction(1000))
