@@ -85,6 +85,12 @@ register(
 )
 
 register(
+    id='diag5x5-dense-v0',
+    entry_point='envs.ilg_rm.ilg_environment:MyDiag5x5DenseEnv',
+    max_episode_steps=1600, # should have  been 800 to match rce 
+)
+
+register(
     id='diag7x7-dense-v0',
     #point_maze-7x7-diagonal-one-sparse-10goals
     entry_point='envs.ilg_rm.ilg_environment:MyDiag7x7DenseEnv',
