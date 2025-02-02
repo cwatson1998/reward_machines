@@ -5,7 +5,7 @@ FULL_ID="$RANDOM"
 echo the full id is $FULL_ID
 
 EXPERIMENT=pdirl
-ENV=stack_twoblock_choice_50_examples_outwardview
+ENV=stackChoiceOutwardview-dense-v0
 WANDB_ENTITY=penn-pal
 WANDB_NAME=hrm_stack_choice_new
 WANDB_TAG=hrm_stack_choice_outwardview_new
