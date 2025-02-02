@@ -154,7 +154,7 @@ def learn(env,
     obs = env.reset()
     options.reset()
     reset = True
-
+    loaded_model=False
     with tempfile.TemporaryDirectory() as td:
         td = checkpoint_path or td
 
@@ -164,6 +164,7 @@ def learn(env,
         if tf.train.latest_checkpoint(td) is not None:
             load_variables(model_file)
             logger.log('Loaded model from {}'.format(model_file))
+            loaded_model=True
             model_saved = True
         elif load_path is not None:
             load_variables(load_path)
@@ -171,6 +172,8 @@ def learn(env,
 
         
         for t in range(total_timesteps):
+            if loaded_model:
+                t + t + 10_000_000
             if callback is not None:
                 if callback(locals(), globals()):
                     break

@@ -4,7 +4,7 @@
 #SBATCH --open-mode=append
 #SBATCH --job-name=pdirl
 #SBATCH --gres=gpu:1
-#SBATCH --array=0
+#SBATCH --array=0-3
 
 
 ##SBATCH --partition=batch
@@ -86,8 +86,10 @@ for((i=0; i<$N_JOB; i++))
 do
     TASK_OUT_DIR=$OUT_DIR/task$i
     TASK_LOG_DIR=$TASK_OUT_DIR/logs
+    TASK_SAVE_DIR=$TASK_OUT_DIR/save
 
     mkdir -p $TASK_LOG_DIR
+    mkdir -p $TASK_SAVE_DIR
 
     scontrol show -dd job $SLURM_JOB_ID > $TASK_LOG_DIR/slurm.out 2>&1
     printenv >> $TASK_LOG_DIR/slurm.out 2>&1
@@ -138,6 +140,7 @@ do
         --gamma=0.99 \
         --alg=dhrm \
         --log_path=$TASK_LOG_DIR \
+        --save_path=$TASK_SAVE_DIR \
         -r_max=1000 \
         >> $TASK_LOG_DIR/app.log 2>&1
         TRAIN_EXIT_CODE=$?
