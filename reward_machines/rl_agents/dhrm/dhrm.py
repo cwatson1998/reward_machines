@@ -333,9 +333,10 @@ def gym_eval(env,
         Wrapper over act function. Adds ability to save it and load it.
         See header of baselines/deepq/categorical.py for details on the act function.
     """
-    eval_episodes = others['eval_episodes']
-
-
+    # eval_episodes = others['eval_episodes']
+    
+    eval_episodes = 100
+    print(f"hardcoded eval episodes in dhrm to {eval_episodes}")
     # wandb.init(project=others['wandb_project'],
     #            name=others['wandb_name'],
     #            entity=others['wandb_entity'],
