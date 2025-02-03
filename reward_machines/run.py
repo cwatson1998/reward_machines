@@ -94,8 +94,8 @@ def train(args, extra_args):
         alg_kwargs['wandb_tag'] = args.wandb_tag
         alg_kwargs['wandb_project'] = args.wandb_project
         alg_kwargs['eval_episodes'] = args.eval_episodes
-        if args.load_path is not None:
-            alg_kwargs['load_path'] = args.load_path
+        if args.save_path is not None:
+            alg_kwargs['save_path'] = args.save_path
 
     print('Training {} on {}:{} with arguments \n{}'.format(
         args.alg, env_type, env_id, alg_kwargs))

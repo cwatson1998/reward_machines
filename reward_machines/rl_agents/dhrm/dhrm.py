@@ -293,6 +293,7 @@ def gym_eval(env,
           checkpoint_path=None,
           checkpoint_freq=10000,
           load_path=None,
+          save_path=None,
           **others):
     """Train a deepq model.
 
@@ -425,9 +426,9 @@ def gym_eval(env,
         #     logger.log('Loaded model from {}'.format(model_file))
         #     loaded_model=True
         #     model_saved = True
-        assert load_path is not None, "Must specify load_path for eval."
-        load_variables(load_path)
-        logger.log('Loaded model from {}'.format(load_path))
+        assert save_path is not None, "Must specify save_path for eval."
+        load_variables(save_path)
+        logger.log('Loaded model from {}'.format(save_path))
 
         
         while len(episode_data_lists['best_is_success']) < eval_episodes:
