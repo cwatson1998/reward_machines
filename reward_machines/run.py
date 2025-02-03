@@ -93,13 +93,17 @@ def train(args, extra_args):
         alg_kwargs['wandb_entity'] = args.wandb_entity
         alg_kwargs['wandb_tag'] = args.wandb_tag
         alg_kwargs['wandb_project'] = args.wandb_project
+        alg_kwargs['eval_episodes'] = args.eval_episodes
 
     print('Training {} on {}:{} with arguments \n{}'.format(
         args.alg, env_type, env_id, alg_kwargs))
 
     if args.eval_episodes is not None:
         extra_args['eval_episodes'] = args.eval_episodes
-        results_dict = gym_eval(args, extra_args)
+        results_dict = gym_eval(env=env,
+                                seed=seed,
+                                total_timesteps=total_timesteps,
+                                **alg_kwargs)
         print("We happily got the results. We aren't saving them anywhere.")
         sys.exit(0)
     
