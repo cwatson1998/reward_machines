@@ -21,7 +21,7 @@ from envs.water.water_world import Ball, BallAgent
 from reward_machines.rm_environment import RewardMachineWrapper
 from cmd_util import make_vec_env, make_env, common_arg_parser
 from client import GymClient
-from rl_agents.dhrm import eval
+from rl_agents.dhrm.dhrm import eval
 
 try:
     from mpi4py import MPI

@@ -125,7 +125,6 @@ do
         if ps -p $SERVER_PID > /dev/null; then
             kill -9 $SERVER_PID
         fi
-sleep 60
         
 done
 echo "Shutting down server process (PID: $SERVER_PID)"
