@@ -97,6 +97,13 @@ def train(args, extra_args):
     print('Training {} on {}:{} with arguments \n{}'.format(
         args.alg, env_type, env_id, alg_kwargs))
 
+    if args.eval_episodes is not None:
+        extra_args['eval_episodes'] = args.eval_episodes
+        results_dict = gym_eval(args, extra_args)
+        print("We happily got the results. We aren't saving them anywhere.")
+        sys.exit(0)
+    
+
     model = learn(
         env=env,
         seed=seed,
@@ -241,13 +248,9 @@ def main(args):
         configure_logger(args.log_path, format_strs=[])
 
 
-    if args.eval_episodes is None:
-        model, env = train(args, extra_args)
-    else:
-        extra_args['eval_episodes'] = args.eval_episodes
-        results_dict = gym_eval(args, extra_args)
-        print("We happily got the results. We aren't saving them anywhere.")
-        return
+    
+    model, env = train(args, extra_args)
+    
 
     if args.save_path is not None and rank == 0:
         save_path = osp.expanduser(args.save_path)
