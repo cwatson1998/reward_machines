@@ -244,6 +244,7 @@ def main(args):
     if args.eval_episodes is None:
         model, env = train(args, extra_args)
     else:
+        extra_args['eval_episodes'] = args.eval_episodes
         results_dict = gym_eval(args, extra_args)
         print("We happily got the results. We aren't saving them anywhere.")
         return
