@@ -122,6 +122,7 @@ def common_arg_parser():
     Create an argparse.ArgumentParser.
     """
     parser = arg_parser()
+    parser.add_argument('--eval_episodes', help='eval_episodes', type=int, default=None)
     parser.add_argument(
         '--vram_frac', help='Amount of vram to allocate', default=0.1, type=float)
     parser.add_argument('--port', help='port (only used for ILG-Learn)', type=int, default=None)
