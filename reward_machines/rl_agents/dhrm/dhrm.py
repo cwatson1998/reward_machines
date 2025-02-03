@@ -280,7 +280,7 @@ def learn(env,
     return controller.act, options.act
 
 
-def eval(env,
+def gym_eval(env,
           use_ddpg=False,
           gamma=0.9,
           use_rs=False,

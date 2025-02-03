@@ -21,7 +21,7 @@ from envs.water.water_world import Ball, BallAgent
 from reward_machines.rm_environment import RewardMachineWrapper
 from cmd_util import make_vec_env, make_env, common_arg_parser
 from client import GymClient
-from rl_agents.dhrm.dhrm import eval
+from rl_agents.dhrm.dhrm import gym_eval
 
 try:
     from mpi4py import MPI
@@ -58,18 +58,6 @@ _game_envs['retro'] = {
     'SpaceInvaders-Snes',
 }
 
-def eval(args, extra_args):
-    env_type, env_id = get_env_type(args)
-    print('env_type: {}'.format(env_type))
-
-    total_timesteps = int(args.num_timesteps)
-    seed = args.seed
-
-    learn = get_learn_function(args.alg)
-    alg_kwargs = get_learn_function_defaults(args.alg, env_type)
-    alg_kwargs.update(extra_args)
-
-    env = build_env(args)
 
 
 def train(args, extra_args):
@@ -256,7 +244,7 @@ def main(args):
     if args.eval_episodes is None:
         model, env = train(args, extra_args)
     else:
-        results_dict = eval(args, extra_args)
+        results_dict = gym_eval(args, extra_args)
         print("We happily got the results. We aren't saving them anywhere.")
         return
 
