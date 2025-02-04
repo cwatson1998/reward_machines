@@ -387,6 +387,24 @@ def gym_eval(env,
         options = OptionDDPG(env, gamma, total_timesteps, **option_kargs)
     else:
         options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
+    # This 
+    saver = tf.train.Saver()
+    # This would be an ok place to try to load.
+    
+    
+    assert save_path is not None, "Must specify save_path for eval."
+    
+    
+    # print("about to try to unfinalize the graph")
+    # tf.get_default_graph()._unsafe_unfinalize()
+    load_variables(save_path)
+    # sess.run(tf.assign(is_training, False))
+    logger.log('Loaded model from {}'.format(save_path))
+    
+    sess.graph.finalize()
+    options.agent.reset()
+
+
         
     option_s    = None # State where the option initiated
     option_id   = None # Id of the current option being executed
@@ -447,14 +465,7 @@ def gym_eval(env,
         #     logger.log('Loaded model from {}'.format(model_file))
         #     loaded_model=True
         #     model_saved = True
-        assert save_path is not None, "Must specify save_path for eval."
         
-        
-        # print("about to try to unfinalize the graph")
-        # tf.get_default_graph()._unsafe_unfinalize()
-        # load_variables(save_path)
-        # sess.run(tf.assign(is_training, False))
-        logger.log('Loaded model from {}'.format(save_path))
 
         t = -1
         while len(episode_data_lists['best_is_success']) < eval_episodes:
