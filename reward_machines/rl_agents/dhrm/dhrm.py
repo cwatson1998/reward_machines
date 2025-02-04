@@ -432,8 +432,9 @@ def gym_eval(env,
         load_variables(save_path)
         logger.log('Loaded model from {}'.format(save_path))
 
-        
+        t = -1
         while len(episode_data_lists['best_is_success']) < eval_episodes:
+            t = t + 1
             if len(episode_data_lists['best_is_success']) % 50 == 0:
                 print(f"We completed {len(episode_data_lists['best_is_success'])} episodes")
             # if loaded_model:
