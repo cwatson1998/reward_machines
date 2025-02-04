@@ -95,7 +95,7 @@ def learn(env,
           checkpoint_freq=checkpoint_freq,
           load_path=load_path))
     # Create all the functions necessary to train the model
-
+    saver = tf.train.Saver()
     sess = get_session()
     set_global_seeds(seed)
 
@@ -272,9 +272,12 @@ def learn(env,
                                    saved_mean_reward, mean_100ep_reward))
                     save_variables(model_file)
                     save_checkpoint_name = f"{model_checkpoint_file}_{mean_100ep_reward}_"
-                    save_variables(save_checkpoint_name)
+                    print(f"trying to save sess at {td}/save_model.ckpt-{t}")
+                    saver.save(sess, f'{td}/saver_model.ckpt', global_step=t)
+                    
                     print(f"Tried to save to {model_file}")
                     print(f"Tried to save to {save_checkpoint_name}")
+                    
                     model_saved = True
                     saved_mean_reward = mean_100ep_reward
         if model_saved:
