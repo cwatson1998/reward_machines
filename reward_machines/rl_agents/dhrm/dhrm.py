@@ -99,8 +99,8 @@ def learn(env,
     
 
     controller  = ControllerDQN(env, **controller_kargs)
-    saver = tf.train.Saver()
-    print('debug made it past controller and saver')
+    # saver = tf.train.Saver()
+    # print('debug made it past controller and saver')
     sess = get_session()
     if use_ddpg:
         options = OptionDDPG(env, gamma, total_timesteps, **option_kargs)

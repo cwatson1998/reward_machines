@@ -293,9 +293,10 @@ class OptionDDPG:
         sess = U.get_session()
         # Prepare everything.
         agent.initialize(sess)
-        sess.graph.finalize()
+        # Moving the following out to dhrm code
+        # sess.graph.finalize()
 
-        agent.reset()
+        # agent.reset()
 
         # Variables that are used during learning
         self.act    = actor
