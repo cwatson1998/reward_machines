@@ -96,8 +96,7 @@ def learn(env,
           load_path=load_path))
     # Create all the functions necessary to train the model
     
-    sess = get_session()
-    set_global_seeds(seed)
+    
 
     controller  = ControllerDQN(env, **controller_kargs)
 
@@ -106,6 +105,10 @@ def learn(env,
         options = OptionDDPG(env, gamma, total_timesteps, **option_kargs)
     else:
         options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
+
+    saver = tf.train.Saver()
+    sess = get_session()
+    set_global_seeds(seed)
         
     option_s    = None # State where the option initiated
     option_id   = None # Id of the current option being executed
@@ -155,7 +158,7 @@ def learn(env,
     options.reset()
     reset = True
     loaded_model=False
-    saver = tf.train.Saver()
+    
     with tempfile.TemporaryDirectory() as td:
         td = td
         cd = checkpoint_path
