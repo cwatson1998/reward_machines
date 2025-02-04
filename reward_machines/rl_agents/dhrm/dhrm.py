@@ -156,9 +156,11 @@ def learn(env,
     reset = True
     loaded_model=False
     with tempfile.TemporaryDirectory() as td:
-        td = checkpoint_path or td
+        td = td
+        cd = checkpoint_path
 
         model_file = os.path.join(td, "model")
+        model_checkpoint_file = os.path.join(checkpoint_path, "model")
         model_saved = False
 
         if tf.train.latest_checkpoint(td) is not None:
@@ -268,7 +270,8 @@ def learn(env,
                     if print_freq is not None:
                         logger.log("Saving model due to mean reward increase: {} -> {}".format(
                                    saved_mean_reward, mean_100ep_reward))
-                    save_variables(f"{model_file}_{t}")
+                    save_variables(model_file)
+                    save_variables(model_checkpoint_file)
                     print(f"Tried to save to {model_file}")
                     model_saved = True
                     saved_mean_reward = mean_100ep_reward
