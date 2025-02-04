@@ -271,8 +271,10 @@ def learn(env,
                         logger.log("Saving model due to mean reward increase: {} -> {}".format(
                                    saved_mean_reward, mean_100ep_reward))
                     save_variables(model_file)
-                    save_variables(model_checkpoint_file)
+                    save_checkpoint_name = f"{model_checkpoint_file}_{mean_100ep_reward}_"
+                    save_variables(save_checkpoint_name)
                     print(f"Tried to save to {model_file}")
+                    print(f"Tried to save to {save_checkpoint_name}")
                     model_saved = True
                     saved_mean_reward = mean_100ep_reward
         if model_saved:
