@@ -427,6 +427,8 @@ def gym_eval(env,
         #     loaded_model=True
         #     model_saved = True
         assert save_path is not None, "Must specify save_path for eval."
+        print("about to try to unfinalize the graph")
+        tf.get_default_graph()._unsafe_unfinalize()
         load_variables(save_path)
         logger.log('Loaded model from {}'.format(save_path))
 
