@@ -96,6 +96,7 @@ def train(args, extra_args):
         alg_kwargs['eval_episodes'] = args.eval_episodes
         if args.save_path is not None:
             alg_kwargs['save_path'] = args.save_path
+            alg_kwargs['checkpoint_path'] = args.save_path
 
     print('Training {} on {}:{} with arguments \n{}'.format(
         args.alg, env_type, env_id, alg_kwargs))

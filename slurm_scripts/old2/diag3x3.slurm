@@ -1,18 +1,43 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#SBATCH --mem-per-gpu=16G
+#SBATCH --cpus-per-gpu=6
+#SBATCH --open-mode=append
+#SBATCH --job-name=pdirl
+#SBATCH --gpus=1
+#SBATCH --array=0
+
+
+##SBATCH --partition=batch
+##SBATCH --qos=normal
+##SBATCH --time=24:00:00
+#TIMEOUT=24h
+
+#SBATCH --partition=dineshj-compute
+#SBATCH --qos=dj-med
+#SBATCH --time=12:00:00
+TIMEOUT=12h
+
+##SBATCH --partition=dineshj-compute
+##SBATCH --qos=dj-high
+##SBATCH --time=24:00:00
+#TIMEOUT=24h
+
+
+
 
 N_JOB=1
-FULL_ID="$RANDOM"
+FULL_ID="${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 echo the full id is $FULL_ID
 
 EXPERIMENT=pdirl
-ENV=stackAB-dense-v0
+ENV=diag3x3-dense-v0
 WANDB_ENTITY=penn-pal
-WANDB_NAME=hrm_stack_AB_local_new
-WANDB_TAG=hrm_stackAB_new
+WANDB_NAME=pointmaze_slurm
+WANDB_TAG=delete_this
 
-# export MUJOCO_GL=egl
-# export CUDA_VISIBLE_DEVICES=0
-# export MUJOCO_EGL_DEVICE_ID=$CUDA_VISIBLE_DEVICES
+export MUJOCO_GL=egl
+export CUDA_VISIBLE_DEVICES=0
+export MUJOCO_EGL_DEVICE_ID=$CUDA_VISIBLE_DEVICES
 
 EXP_NAME=$EXPERIMENT-$ENV-$FULL_ID
 OUT_DIR=outputs/$EXP_NAME
@@ -28,17 +53,17 @@ OUT_DIR=outputs/$EXP_NAME
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-# __conda_setup="$('/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-# if [ $? -eq 0 ]; then
-#     eval "$__conda_setup"
-# else
-#     if [ -f "/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/etc/profile.d/conda.sh" ]; then
-#         . "/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/etc/profile.d/conda.sh"
-#     else
-#         export PATH="/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/bin:$PATH"
-#     fi
-# fi
-# unset __conda_setup
+__conda_setup="$('/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/mnt/kostas-graid/sw/envs/chriswatson/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
 # <<< conda initialize <<<
 
 # Function to find an available port in the range 5000-9999
@@ -59,16 +84,13 @@ for((i=0; i<$N_JOB; i++))
 do
     TASK_OUT_DIR=$OUT_DIR/task$i
     TASK_LOG_DIR=$TASK_OUT_DIR/logs
-    TASK_SAVE_DIR=$TASK_OUT_DIR/save
-    TASK_CHECKPOINT_DIR=$TASK_OUT_DIR/checkpoint
 
     mkdir -p $TASK_LOG_DIR
-    mkdir -p $TASK_SAVE_DIR
 
-    # scontrol show -dd job $SLURM_JOB_ID > $TASK_LOG_DIR/slurm.out 2>&1
-    # printenv >> $TASK_LOG_DIR/slurm.out 2>&1
+    scontrol show -dd job $SLURM_JOB_ID > $TASK_LOG_DIR/slurm.out 2>&1
+    printenv >> $TASK_LOG_DIR/slurm.out 2>&1
 
-    # scontrol write batch_script $SLURM_JOB_ID $TASK_LOG_DIR/sbatch.slurm >> $TASK_LOG_DIR/sbatch.slurm 2>&1
+    scontrol write batch_script $SLURM_JOB_ID $TASK_LOG_DIR/sbatch.slurm >> $TASK_LOG_DIR/sbatch.slurm 2>&1
 
     git rev-parse HEAD >> $TASK_LOG_DIR/head_commit_hash
 
@@ -82,24 +104,26 @@ do
 
 
     
-#    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
-#     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
-#    conda activate pdirl
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
+    conda activate jax-conda-new
 
-    # export MUJOCO_GL=egl
-    # export CUDA_VISIBLE_DEVICES=0
-    # export MUJOCO_EGL_DEVICE_ID=$CUDA_VISIBLE_DEVICES
+    export MUJOCO_GL=egl
+    export CUDA_VISIBLE_DEVICES=0
+    export MUJOCO_EGL_DEVICE_ID=$CUDA_VISIBLE_DEVICES
 
 
-    /home/christopher/miniconda3/envs/pdirl/bin/python3 ../../pdirl/server.py $FREE_PORT &
+    python ../../pdirl/server.py $FREE_PORT &
     SERVER_PID=$!
     trap "echo 'SLURM job terminating, killing server (PID: $SERVER_PID)'; kill $SERVER_PID 2>/dev/null" SIGTERM SIGINT EXIT
 
-    sleep 10
+    sleep 15
 
- #   conda activate hrm
-    /home/christopher/miniconda3/envs/hrm/bin/python3 -u run.py \
-        --vram_frac=0.12 \
+    conda activate new-hrm
+    export MUJOCO_GL=egl
+    export PYOPENGL_PLATFORM=egl
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/chriswatson/.mujoco/mujoco210/bin
+    XLA_PYTHON_CLIENT_PREALLOCATE=false timeout --foreground $TIMEOUT python3 -u run.py \
         --wandb_experiment=$EXPERIMENT \
         --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \
@@ -110,12 +134,8 @@ do
         --gamma=0.99 \
         --alg=dhrm \
         --log_path=$TASK_LOG_DIR \
-        --checkpoint_path=$TASK_CHECKPOINT_DIR \
-        --save_path=$TASK_SAVE_DIR \
-        --r_max=1000 \
+        -r_max=100 \
         >> $TASK_LOG_DIR/app.log 2>&1
-        # 2>&1 | tee $TASK_LOG_DIR/app.log
-        #>> $TASK_LOG_DIR/app.log 2>&1
         # Do not send this to the background. It is important for it to block.
         TRAIN_EXIT_CODE=$?
 
@@ -124,7 +144,16 @@ do
         if ps -p $SERVER_PID > /dev/null; then
             kill -9 $SERVER_PID
         fi
-sleep 60
+
+
+        
+        if [[ $? == 124 ]]; then
+            echo timeout on python, asking to requeue
+            echo $FULL_ID
+            scontrol requeue $FULL_ID
+            exit 0
+        fi
+        echo no timeout on python.
         
 done
 echo "Shutting down server process (PID: $SERVER_PID)"
@@ -136,6 +165,11 @@ if ps -p $SERVER_PID > /dev/null; then
         kill -9 $SERVER_PID
     fi
 fi
-echo All processes complete!
 exit 0
+wait
 
+	#>> ${EXPERIMENT}_${ENV}_${SLURM_JOB_ID}.out
+echo All processes complete!
+#TODO - implement retry if job terminated (RL is robust; but planner state needs to be checkpointed and restored)
+
+exit 0

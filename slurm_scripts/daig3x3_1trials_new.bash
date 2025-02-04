@@ -5,10 +5,10 @@ FULL_ID="$RANDOM"
 echo the full id is $FULL_ID
 
 EXPERIMENT=pdirl
-ENV=stackAB-dense-v0
+ENV=diag3x3-dense-v0
 WANDB_ENTITY=penn-pal
-WANDB_NAME=hrm_stack_AB_local_new
-WANDB_TAG=hrm_stackAB_new
+WANDB_NAME=hrm_diag3x3_save
+WANDB_TAG=hrm_diag3x3_save
 
 # export MUJOCO_GL=egl
 # export CUDA_VISIBLE_DEVICES=0
@@ -99,7 +99,7 @@ do
 
  #   conda activate hrm
     /home/christopher/miniconda3/envs/hrm/bin/python3 -u run.py \
-        --vram_frac=0.12 \
+        --vram_frac=0.08 \
         --wandb_experiment=$EXPERIMENT \
         --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \

@@ -1,14 +1,14 @@
 #!/bin/bash
 
-N_JOB=1
+N_JOB=2
 FULL_ID="$RANDOM"
 echo the full id is $FULL_ID
 
 EXPERIMENT=pdirl
-ENV=stackAB-dense-v0
+ENV=diag3x3-dense-v0
 WANDB_ENTITY=penn-pal
-WANDB_NAME=hrm_stack_AB_local_new
-WANDB_TAG=hrm_stackAB_new
+WANDB_NAME=hrm_diag3x3_NEW
+WANDB_TAG=hrm_diag3x3
 
 # export MUJOCO_GL=egl
 # export CUDA_VISIBLE_DEVICES=0
@@ -59,11 +59,8 @@ for((i=0; i<$N_JOB; i++))
 do
     TASK_OUT_DIR=$OUT_DIR/task$i
     TASK_LOG_DIR=$TASK_OUT_DIR/logs
-    TASK_SAVE_DIR=$TASK_OUT_DIR/save
-    TASK_CHECKPOINT_DIR=$TASK_OUT_DIR/checkpoint
 
     mkdir -p $TASK_LOG_DIR
-    mkdir -p $TASK_SAVE_DIR
 
     # scontrol show -dd job $SLURM_JOB_ID > $TASK_LOG_DIR/slurm.out 2>&1
     # printenv >> $TASK_LOG_DIR/slurm.out 2>&1
@@ -99,7 +96,7 @@ do
 
  #   conda activate hrm
     /home/christopher/miniconda3/envs/hrm/bin/python3 -u run.py \
-        --vram_frac=0.12 \
+        --vram_frac=0.24 \
         --wandb_experiment=$EXPERIMENT \
         --port=$FREE_PORT \
         --wandb_name=$WANDB_NAME \
@@ -110,8 +107,6 @@ do
         --gamma=0.99 \
         --alg=dhrm \
         --log_path=$TASK_LOG_DIR \
-        --checkpoint_path=$TASK_CHECKPOINT_DIR \
-        --save_path=$TASK_SAVE_DIR \
         --r_max=1000 \
         >> $TASK_LOG_DIR/app.log 2>&1
         # 2>&1 | tee $TASK_LOG_DIR/app.log
