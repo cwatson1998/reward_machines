@@ -100,14 +100,17 @@ def learn(env,
 
     controller  = ControllerDQN(env, **controller_kargs)
 
-    
+    sess = get_session()
     if use_ddpg:
         options = OptionDDPG(env, gamma, total_timesteps, **option_kargs)
     else:
         options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
-
     saver = tf.train.Saver()
-    sess = get_session()
+    sess.graph.finalize()
+    options.agent.reset()
+
+    
+    
     set_global_seeds(seed)
         
     option_s    = None # State where the option initiated
