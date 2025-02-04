@@ -281,7 +281,7 @@ def learn(env,
                     save_variables(model_file)
                     save_checkpoint_name = f"{model_checkpoint_file}_{mean_100ep_reward}_"
                     print(f"trying to save sess at {td}/save_model.ckpt-{t}")
-                    saver.save(sess, f'{td}/saver_model.ckpt', global_step=t)
+                    saver.save(sess, f'{cd}/saver_model.ckpt', global_step=t)
                     
                     print(f"Tried to save to {model_file}")
                     print(f"Tried to save to {save_checkpoint_name}")
@@ -388,6 +388,7 @@ def gym_eval(env,
     else:
         options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
     # This 
+
     saver = tf.train.Saver()
     # This would be an ok place to try to load.
     
