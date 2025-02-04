@@ -95,7 +95,7 @@ def learn(env,
           checkpoint_freq=checkpoint_freq,
           load_path=load_path))
     # Create all the functions necessary to train the model
-    saver = tf.train.Saver()
+    
     sess = get_session()
     set_global_seeds(seed)
 
@@ -155,6 +155,7 @@ def learn(env,
     options.reset()
     reset = True
     loaded_model=False
+    saver = tf.train.Saver()
     with tempfile.TemporaryDirectory() as td:
         td = td
         cd = checkpoint_path
@@ -440,10 +441,12 @@ def gym_eval(env,
         #     loaded_model=True
         #     model_saved = True
         assert save_path is not None, "Must specify save_path for eval."
-        print("about to try to unfinalize the graph")
-        tf.get_default_graph()._unsafe_unfinalize()
-        load_variables(save_path)
-        sess.run(tf.assign(is_training, False))
+        
+        
+        # print("about to try to unfinalize the graph")
+        # tf.get_default_graph()._unsafe_unfinalize()
+        # load_variables(save_path)
+        # sess.run(tf.assign(is_training, False))
         logger.log('Loaded model from {}'.format(save_path))
 
         t = -1
