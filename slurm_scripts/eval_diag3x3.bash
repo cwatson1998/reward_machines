@@ -113,6 +113,7 @@ do
         --alg=dhrm \
         --log_path=$TASK_LOG_DIR \
         --save_path=$1 \
+        --checkpoint_path=loremipsum \
         --r_max=1000 \
         # >> $TASK_LOG_DIR/app.log 2>&1
         # 2>&1 | tee $TASK_LOG_DIR/app.log
