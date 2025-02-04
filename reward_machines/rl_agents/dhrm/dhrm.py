@@ -435,8 +435,7 @@ def gym_eval(env,
         t = -1
         while len(episode_data_lists['best_is_success']) < eval_episodes:
             t = t + 1
-            if len(episode_data_lists['best_is_success']) % 50 == 0:
-                print(f"We completed {len(episode_data_lists['best_is_success'])} episodes")
+            
             # if loaded_model:
             #     t + t + 10_000_000
             if callback is not None:
@@ -494,6 +493,8 @@ def gym_eval(env,
             
 
             if done:
+                if len(episode_data_lists['best_is_success'])+1 % 50 == 0:
+                    print(f"We completed {len(episode_data_lists['best_is_success'])} episodes in {t} steps")
                 obs = env.reset()
                 options.reset()
                 episode_rewards.append(0.0)
