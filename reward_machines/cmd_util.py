@@ -121,9 +121,10 @@ def common_arg_parser():
     """
     Create an argparse.ArgumentParser.
     """
+    
+    parser = arg_parser()
     parser.add_argument(
         '--checkpoint_path', help='Path to save trained model to', default=None, type=str)
-    parser = arg_parser()
     parser.add_argument('--eval_episodes', help='eval_episodes', type=int, default=None)
     parser.add_argument(
         '--vram_frac', help='Amount of vram to allocate', default=0.1, type=float)
