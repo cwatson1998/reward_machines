@@ -94,7 +94,7 @@ def train(args, extra_args):
         alg_kwargs['wandb_tag'] = args.wandb_tag
         alg_kwargs['wandb_project'] = args.wandb_project
         alg_kwargs['eval_episodes'] = args.eval_episodes
-        assert args.checkpoint_path is not None
+        assert args.checkpoint_path is not None or args.save_path 
         alg_kwargs['checkpoint_path'] = args.checkpoint_path
         assert args.save_path is not None
         alg_kwargs['save_path'] = args.save_path
@@ -262,7 +262,11 @@ def main(args):
 
     if args.save_path is not None and rank == 0:
         save_path = osp.expanduser(args.save_path)
-        model.save(save_path)
+        save_path_a = f"{save_path}_a"
+        save_path_b = f"{save_path}_b"
+        model_a, model_b = model
+        model_a.save(save_path_a)
+        model_b.save(save_path_b)
 
     if args.play:
         logger.log("Running trained model")
