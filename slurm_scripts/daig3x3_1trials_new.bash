@@ -64,6 +64,7 @@ do
 
     mkdir -p $TASK_LOG_DIR
     mkdir -p $TASK_SAVE_DIR
+    mkdir -p $TASK_CHECKPOINT_DIR
 
     # scontrol show -dd job $SLURM_JOB_ID > $TASK_LOG_DIR/slurm.out 2>&1
     # printenv >> $TASK_LOG_DIR/slurm.out 2>&1
