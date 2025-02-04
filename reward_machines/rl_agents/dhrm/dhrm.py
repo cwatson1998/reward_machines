@@ -283,6 +283,10 @@ def learn(env,
             #load_variables(model_file)
         wandb.finish()
 
+    print("About to try to save options.agent")
+    options_checkpoint_name = f"{model_checkpoint_file}_options_agent"
+    options.agent.save(options_checkpoint_name)
+    print("debug success")
     return controller.act, options.act
 
 
@@ -436,6 +440,7 @@ def gym_eval(env,
         print("about to try to unfinalize the graph")
         tf.get_default_graph()._unsafe_unfinalize()
         load_variables(save_path)
+        sess.run(tf.assign(is_training, False))
         logger.log('Loaded model from {}'.format(save_path))
 
         t = -1
