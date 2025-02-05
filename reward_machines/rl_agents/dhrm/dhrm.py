@@ -293,12 +293,18 @@ def learn(env,
             if print_freq is not None:
                 logger.log("Restored model with mean reward: {}".format(saved_mean_reward))
             #load_variables(model_file)
+        print("Now I'm going to try to do some more rollouts to eval right here!")
+        
+        
+        
+        
+        
         wandb.finish()
 
-    print("About to try to save options.agent")
-    options_checkpoint_name = f"{model_checkpoint_file}_options_agent"
-    options.agent.save(options_checkpoint_name)
-    print("debug success")
+
+
+
+
     return controller.act, options.act
 
 
@@ -316,6 +322,9 @@ def gym_eval(env,
           checkpoint_freq=10000,
           load_path=None,
           save_path=None,
+          premade_controller=None,
+          premade_options=None,
+          eval_episodes=100,
           **others):
     """Train a deepq model.
 
@@ -358,7 +367,8 @@ def gym_eval(env,
     """
     # eval_episodes = others['eval_episodes']
     
-    eval_episodes = 100
+
+    
     print(f"hardcoded eval episodes in dhrm to {eval_episodes}")
     # wandb.init(project=others['wandb_project'],
     #            name=others['wandb_name'],
@@ -381,31 +391,38 @@ def gym_eval(env,
     sess = get_session()
     set_global_seeds(seed)
 
-    controller  = ControllerDQN(env, **controller_kargs)
-    print("after making controller but before making options it looks like this")
-    for var in tf.global_variables():
-        print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
-    if use_ddpg:
-        options = OptionDDPG(env, gamma, total_timesteps, **option_kargs)
+    if premade_controller is None:
+        assert premade_options is None
+        controller  = ControllerDQN(env, **controller_kargs)
+        print("after making controller but before making options it looks like this")
+        for var in tf.global_variables():
+            print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
+        if use_ddpg:
+            options = OptionDDPG(env, gamma, total_timesteps, **option_kargs)
+        else:
+            options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
+        # This 
+        print("after making options it looks like this:")
+        saver = tf.train.Saver()
+        for var in tf.global_variables():
+            print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
+
+        logger.log('trying to load model from {}'.format(save_path))
+        # load_variables(save_path)
+        saver.restore(sess, save_path)
+        print("after loading it looks like")
+        for var in tf.global_variables():
+            print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
+        sess.graph.finalize()
     else:
-        options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
-    # This 
-    print("after making options it looks like this:")
-    saver = tf.train.Saver()
-    for var in tf.global_variables():
-        print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
-
-    logger.log('trying to load model from {}'.format(save_path))
-    load_variables(save_path)
-    saver.restore(sess, save_path)
-    print("after loading it looks like")
-    for var in tf.global_variables():
-        print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
-
+        assert save_path
+        controller = premade_controller
+        options= premade_options
+    
     # This would be an ok place to try to load.
     
     
-    assert save_path is not None, "Must specify save_path for eval."
+    
     
     
     # print("about to try to unfinalize the graph")
@@ -414,7 +431,7 @@ def gym_eval(env,
     # sess.run(tf.assign(is_training, False))
     
     
-    sess.graph.finalize()
+    
     options.agent.reset()
 
 
