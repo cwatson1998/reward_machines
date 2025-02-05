@@ -278,14 +278,14 @@ def learn(env,
                     if print_freq is not None:
                         logger.log("Saving model due to mean reward increase: {} -> {}".format(
                                    saved_mean_reward, mean_100ep_reward))
-                    save_variables(model_file)
-                    save_checkpoint_name = f"{model_checkpoint_file}_{mean_100ep_reward}_"
+                    # save_variables(model_file)
+                    # save_checkpoint_name = f"{model_checkpoint_file}_{mean_100ep_reward}_"
                     saver_stem = f'{cd}/saver_model.ckpt'
                     print(f"Trying to use saver to save at {saver_stem}")
                     saver.save(sess, saver_stem, global_step=t)
                     
-                    print(f"Tried to save to {model_file}")
-                    print(f"Tried to save to {save_checkpoint_name}")
+                    # print(f"Tried to save to {model_file}")
+                    # print(f"Tried to save to {save_checkpoint_name}")
                     
                     model_saved = True
                     saved_mean_reward = mean_100ep_reward
@@ -391,13 +391,13 @@ def gym_eval(env,
         options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
     # This 
     print("after making options it looks like this:")
-    # saver = tf.train.Saver()
+    saver = tf.train.Saver()
     for var in tf.global_variables():
         print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
 
     logger.log('trying to load model from {}'.format(save_path))
     load_variables(save_path)
-    # saver.restore(sess, save_path)
+    saver.restore(sess, save_path)
     print("after loading it looks like")
     for var in tf.global_variables():
         print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
