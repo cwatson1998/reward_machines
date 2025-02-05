@@ -78,6 +78,8 @@ def learn(env,
         Wrapper over act function. Adds ability to save it and load it.
         See header of baselines/deepq/categorical.py for details on the act function.
     """
+    assert checkpoint_path is not None
+    print(f"checkpoint path: {checkpoint_path}")
     wandb.init(project=others['wandb_project'],
                name=others['wandb_name'],
                entity=others['wandb_entity'],
@@ -167,8 +169,8 @@ def learn(env,
         td = td
         cd = checkpoint_path
 
-        model_file = os.path.join(td, "model")
-        model_checkpoint_file = os.path.join(checkpoint_path, "model")
+        # model_file = os.path.join(td, "model")
+        # model_checkpoint_file = os.path.join(checkpoint_path, "model")
         model_saved = False
 
         # if tf.train.latest_checkpoint(td) is not None:
@@ -498,8 +500,8 @@ def gym_eval(env,
     with tempfile.TemporaryDirectory() as td:
         td = checkpoint_path or td
 
-        model_file = os.path.join(td, "model")
-        model_saved = False
+        # model_file = os.path.join(td, "model")
+        # model_saved = False
 
         # if tf.train.latest_checkpoint(td) is not None:
         #     load_variables(model_file)
