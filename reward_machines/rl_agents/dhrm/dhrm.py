@@ -428,7 +428,7 @@ def gym_eval(env,
             print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
         sess.graph.finalize()
     else:
-        assert save_path
+        assert save_path is None
         controller = premade_controller
         options= premade_options
     
