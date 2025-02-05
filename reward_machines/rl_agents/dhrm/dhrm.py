@@ -391,8 +391,16 @@ def gym_eval(env,
     # This 
 
     saver = tf.train.Saver()
+    for var in tf.global_variables():
+        print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
+
     logger.log('trying to load model from {}'.format(save_path))
+
     saver.restore(sess, save_path)
+    print("after loading it looks like")
+    for var in tf.global_variables():
+        print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
+
     # This would be an ok place to try to load.
     
     
@@ -581,12 +589,13 @@ def gym_eval(env,
 #                 logger.log("Restored model with mean reward: {}".format(saved_mean_reward))
 #             #load_variables(model_file)
 #         wandb.finish()
-    for k,v in episode_data_lists.items():
-        print(f"{k}: {v}")
+    # for k,v in episode_data_lists.items():
+        # print(f"{k}: {v}")
+    
     wandb_log_dict = {
-                    f"{k}_mean100": round(np.mean(v), 3) for k,v in episode_data_lists.items()
+                    f"{k}_mean100": round(np.mean(v[:-1]), 5) for k,v in episode_data_lists.items()
                 }
-    wandb_log_dict['hrm_reward_mean100'] = round(np.mean(episode_rewards), 3)
+    wandb_log_dict['hrm_reward_mean100'] = round(np.mean(episode_rewards[:-1]), 5)
     print(wandb_log_dict)
     for k,v in wandb_log_dict.items():
         # print(f"{k}: {v}")
