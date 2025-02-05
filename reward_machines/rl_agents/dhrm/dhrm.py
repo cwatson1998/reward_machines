@@ -171,14 +171,14 @@ def learn(env,
         model_checkpoint_file = os.path.join(checkpoint_path, "model")
         model_saved = False
 
-        if tf.train.latest_checkpoint(td) is not None:
-            load_variables(model_file)
-            logger.log('Loaded model from {}'.format(model_file))
-            loaded_model=True
-            model_saved = True
-        elif load_path is not None:
-            load_variables(load_path)
-            logger.log('Loaded model from {}'.format(load_path))
+        # if tf.train.latest_checkpoint(td) is not None:
+        #     load_variables(model_file)
+        #     logger.log('Loaded model from {}'.format(model_file))
+        #     loaded_model=True
+        #     model_saved = True
+        # elif load_path is not None:
+        #     load_variables(load_path)
+        #     logger.log('Loaded model from {}'.format(load_path))
 
         
         for t in range(total_timesteps):
@@ -280,8 +280,9 @@ def learn(env,
                                    saved_mean_reward, mean_100ep_reward))
                     save_variables(model_file)
                     save_checkpoint_name = f"{model_checkpoint_file}_{mean_100ep_reward}_"
-                    print(f"trying to save sess at {td}/save_model.ckpt-{t}")
-                    saver.save(sess, f'{cd}/saver_model.ckpt', global_step=t)
+                    saver_stem = f'{cd}/saver_model.ckpt'
+                    print(f"Trying to use saver to save at {saver_stem}")
+                    saver.save(sess, saver_stem, global_step=t)
                     
                     print(f"Tried to save to {model_file}")
                     print(f"Tried to save to {save_checkpoint_name}")
@@ -390,6 +391,8 @@ def gym_eval(env,
     # This 
 
     saver = tf.train.Saver()
+    logger.log('trying to load model from {}'.format(save_path))
+    saver.restore(save_path)
     # This would be an ok place to try to load.
     
     
@@ -398,9 +401,9 @@ def gym_eval(env,
     
     # print("about to try to unfinalize the graph")
     # tf.get_default_graph()._unsafe_unfinalize()
-    load_variables(save_path)
+    # load_variables(save_path)
     # sess.run(tf.assign(is_training, False))
-    logger.log('Loaded model from {}'.format(save_path))
+    
     
     sess.graph.finalize()
     options.agent.reset()
