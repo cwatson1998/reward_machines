@@ -392,7 +392,7 @@ def gym_eval(env,
 
     saver = tf.train.Saver()
     logger.log('trying to load model from {}'.format(save_path))
-    saver.restore(save_path)
+    saver.restore(sess, save_path)
     # This would be an ok place to try to load.
     
     
