@@ -598,8 +598,8 @@ def gym_eval(env,
     wandb_log_dict['hrm_reward_mean100'] = round(np.mean(episode_rewards[:-1]), 5)
     print(wandb_log_dict)
     for k,v in wandb_log_dict.items():
-        # print(f"{k}: {v}")
-        for vv in v:
-            print(f"{k}: {vv}")
+        print(f"{k}: {v}")
+        # for vv in v:
+        #     print(f"{k}: {vv}")
     print("that concludes the eval")
     return wandb_log_dict
