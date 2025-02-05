@@ -94,9 +94,10 @@ def train(args, extra_args):
         alg_kwargs['wandb_tag'] = args.wandb_tag
         alg_kwargs['wandb_project'] = args.wandb_project
         alg_kwargs['eval_episodes'] = args.eval_episodes
-        assert args.checkpoint_path is not None or args.save_path 
+        assert args.checkpoint_path is not None or args.save_path is not None 
         alg_kwargs['checkpoint_path'] = args.checkpoint_path
-        assert args.save_path is not None
+        if args.checkpoint_path is None:
+            alg_kwargs['checkpoint_path'] = args.save_path
         alg_kwargs['save_path'] = args.save_path
 
     print('Training {} on {}:{} with arguments \n{}'.format(
