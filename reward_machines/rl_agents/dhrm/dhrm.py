@@ -382,14 +382,15 @@ def gym_eval(env,
     set_global_seeds(seed)
 
     controller  = ControllerDQN(env, **controller_kargs)
-
-    
+    print("after making controller but before making options it looks like this")
+    for var in tf.global_variables():
+        print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
     if use_ddpg:
         options = OptionDDPG(env, gamma, total_timesteps, **option_kargs)
     else:
         options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
     # This 
-
+    print("after making options it looks like this:")
     saver = tf.train.Saver()
     for var in tf.global_variables():
         print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
