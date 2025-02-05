@@ -4,7 +4,7 @@
 #SBATCH --open-mode=append
 #SBATCH --job-name=pdirl
 #SBATCH --gres=gpu:1
-#SBATCH --array=0-1
+#SBATCH --array=0-4
 
 
 ##SBATCH --partition=batch
