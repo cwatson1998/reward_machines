@@ -295,8 +295,19 @@ def learn(env,
             #load_variables(model_file)
         print("Now I'm going to try to do some more rollouts to eval right here!")
         
-        
-        
+        final_eval_dict = gym_eval(
+            env,
+            use_ddpg=use_ddpg,
+            use_rs=use_rs,
+            seed=seed,
+            premade_controller=controller,
+            premade_options=options,
+            eval_episodes=1000
+        )
+        print("the final eval completed.")
+        final_eval_dict = {f"final_{k}": v for k, v in final_eval_dict.items()}
+        wandb.log(final_eval_dict, step=t)
+        print("I uploaded final eval to wandb final eval completed.")
         
         
         wandb.finish()
