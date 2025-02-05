@@ -391,13 +391,13 @@ def gym_eval(env,
         options = OptionDQN(env, gamma, total_timesteps, **option_kargs)
     # This 
     print("after making options it looks like this:")
-    saver = tf.train.Saver()
+    # saver = tf.train.Saver()
     for var in tf.global_variables():
         print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
 
     logger.log('trying to load model from {}'.format(save_path))
-
-    saver.restore(sess, save_path)
+    load_variables(save_path)
+    # saver.restore(sess, save_path)
     print("after loading it looks like")
     for var in tf.global_variables():
         print(f"{var.name}: mean={sess.run(var).mean()}, std={sess.run(var).std()}")
