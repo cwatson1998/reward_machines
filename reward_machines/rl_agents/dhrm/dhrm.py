@@ -499,7 +499,7 @@ def gym_eval(env,
                 option_rews = []
 
             # Take action and update exploration to the newest value
-            action = options.get_action(env.get_option_observation(option_id), t, reset)
+            action = options.get_action_no_noise(env.get_option_observation(option_id), t, reset)
             reset = False
             new_obs, rew, done, info = env.step(action)
             # print(f"debug: in the loop we get done as {done}")
