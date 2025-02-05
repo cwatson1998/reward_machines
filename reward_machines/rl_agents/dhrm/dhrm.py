@@ -581,7 +581,7 @@ def gym_eval(env,
 #                 logger.log("Restored model with mean reward: {}".format(saved_mean_reward))
 #             #load_variables(model_file)
 #         wandb.finish()
-    for k,v in wandb_log_dict.items():
+    for k,v in episode_data_lists.items():
         print(f"{k}: {v}")
     wandb_log_dict = {
                     f"{k}_mean100": round(np.mean(v), 3) for k,v in episode_data_lists.items()
