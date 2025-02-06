@@ -13,7 +13,7 @@
 #TIMEOUT=24h
 
 #SBATCH --partition=dineshj-compute
-#SBATCH --exclude=dj-2080ti-0.grasp.maas
+#SBATCH --exclude=dj-2080ti-0.grasp.maas,dj-a40-0.grasp.maas
 #SBATCH --qos=dj-med
 #SBATCH --time=12:00:00
 TIMEOUT=12h
