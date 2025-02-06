@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 class RewardFunction:
     def __init__(self):
@@ -79,7 +80,9 @@ class IlgVertexRewardFunction(RewardFunction):
         return f"IlgVertexReward{self.source_vertex_index}"
 
     def get_reward(self, s_info):
-        return s_info['reward_value_array'][self.source_vertex_index]
+        dist = s_info['reward_value_array'][self.source_vertex_index]
+        return np.exp(-dist)
+        # return the exponential negative distance 
     
 class IlgInfoRewardFunction(RewardFunction):
     """

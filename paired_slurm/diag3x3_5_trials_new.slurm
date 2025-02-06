@@ -34,8 +34,8 @@ echo the full id is $FULL_ID
 EXPERIMENT=pdirl
 ENV=diag3x3-dense-v0
 WANDB_ENTITY=penn-pal
-WANDB_NAME=hrm_3x3_new
-WANDB_TAG=hrm_3x3_new
+WANDB_NAME=hrm_3x3_new_new
+WANDB_TAG=hrm_3x3_new_new
 
 export MUJOCO_GL=egl
 export CUDA_VISIBLE_DEVICES=0
