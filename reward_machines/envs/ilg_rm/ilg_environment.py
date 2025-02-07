@@ -73,6 +73,18 @@ class MyDiag7x7DenseEnv(IlgRMEnv):
         rm_files = ["./envs/ilg_rm/reward_machines/diag7x7_dense_rewards.txt"]
         super().__init__(env, rm_files)
 
+
+class MyDiag7x7CoarseEnv(IlgRMEnv):
+    def __init__(self, **kwargs):
+        # Set this up using IPC. The thing on the
+        
+        port = kwargs.get("port", 5000)
+        print("Got port as "+str(port))
+        env = GymClient(port=port)
+        env.make("point_maze-7x7-diagonal-two-sparse-10goals")
+        rm_files = ["./envs/ilg_rm/reward_machines/diag7x7_coarse_rewards.txt"]
+        super().__init__(env, rm_files)
+
 class MyStackChoiceOutwardviewEnv(IlgRMEnv):
     def __init__(self, **kwargs):
         # Set this up using IPC. The thing on the

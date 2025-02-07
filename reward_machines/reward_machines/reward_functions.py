@@ -81,7 +81,8 @@ class IlgVertexRewardFunction(RewardFunction):
 
     def get_reward(self, s_info):
         dist = s_info['reward_value_array'][self.source_vertex_index]
-        return np.exp(-dist)
+        return dist
+        # return np.exp(-dist)
         # return the exponential negative distance 
     
 class IlgInfoRewardFunction(RewardFunction):

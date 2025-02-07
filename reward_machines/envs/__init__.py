@@ -99,6 +99,15 @@ register(
 
 
 register(
+    id='diag7x7-coarse-v0',
+    #point_maze-7x7-diagonal-one-sparse-10goals
+    entry_point='envs.ilg_rm.ilg_environment:MyDiag7x7CoarseEnv',
+    max_episode_steps=2400, # this matches rce but is a lot.
+)
+
+
+
+register(
     id='stackChoiceOutwardview-dense-v0',
     entry_point='envs.ilg_rm.ilg_environment:MyStackChoiceOutwardviewEnv',
     max_episode_steps=250,
