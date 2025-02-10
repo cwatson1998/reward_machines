@@ -5,7 +5,7 @@ FULL_ID="$RANDOM"
 echo the full id is $FULL_ID
 echo You said the save path is $1
 
-EVAL_EPISODES=100
+EVAL_EPISODES=1001
 EXPERIMENT=pdirl
 ENV=diag5x5-dense-v0
 WANDB_ENTITY=penn-pal
