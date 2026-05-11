@@ -55,11 +55,14 @@ class RewardMachineEnv(gym.Wrapper):
 
         # Computing one-hot encodings for the non-terminal RM states
         self.rm_state_features = {}
+        self.rm_state_features_inverse = {}
         for rm_id, rm in enumerate(self.reward_machines):
             for u_id in rm.get_states():
                 u_features = np.zeros(self.num_rm_states)
                 u_features[len(self.rm_state_features)] = 1
                 self.rm_state_features[(rm_id,u_id)] = u_features
+                self.rm_state_features_inverse[tuple([int(elt) for elt in list(u_features)])] = (rm_id, u_id)
+
         self.rm_done_feat = np.zeros(self.num_rm_states) # for terminal RM states, we give as features an array of zeros
 
         # Selecting the current RM task
@@ -76,6 +79,9 @@ class RewardMachineEnv(gym.Wrapper):
         # Adding the RM state to the observation
         return self.get_observation(self.obs, self.current_rm_id, self.current_u_id, False)
 
+    def get_events(self):
+        return self.env.get_events()
+
     def step(self, action):
         # executing the action in the environment
         next_obs, original_reward, env_done, info = self.env.step(action)
@@ -86,7 +92,9 @@ class RewardMachineEnv(gym.Wrapper):
         self.obs = next_obs
 
         # update the RM state
+        old_u_id = self.current_u_id
         self.current_u_id, rm_rew, rm_done = self.current_rm.step(self.current_u_id, true_props, info)
+        #print(f"debug. RewardMachineEnv says {old_u_id} -{true_props}-> {self.current_u_id} gives {rm_rew}")
 
         # returning the result of this action
         done = rm_done or env_done

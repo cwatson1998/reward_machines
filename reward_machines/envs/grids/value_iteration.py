@@ -1,4 +1,5 @@
 
+
 def value_iteration(S,A,L,T,rm,gamma):
     """
     Standard value iteration to compute optimal policies for the grid environments.
@@ -50,5 +51,6 @@ def value_iteration(S,A,L,T,rm,gamma):
             a_i = max((x,i) for i,x in enumerate(q_values))[1] # argmax over the q-valies
             policy[(s1,u1)] = A[a_i]
 
+    print(f"Value iteration complete: computed policy with {len(policy)} state-action pairs")
     return policy
 

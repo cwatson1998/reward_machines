@@ -27,6 +27,9 @@ class GridEnv(gym.Env):
     def reset(self):
         self.env.reset()
         return self.env.get_features()
+    
+    def render(self, mode=None):
+        return self.env.render(mode=mode)
 
     def show(self):
         self.env.show()
@@ -70,6 +73,8 @@ class GridRMEnv(RewardMachineEnv):
                     print("Events:", self.env.get_events())
                 else:
                     print("Forbidden action")
+        elif mode == "rgb_array":
+            return self.env.render(mode='rgb_array')
         else:
             raise NotImplementedError
 
@@ -123,6 +128,12 @@ class OfficeRMEnv(GridRMEnv):
 class OfficeRM3Env(GridRMEnv):
     def __init__(self):
         rm_files = ["./envs/grids/reward_machines/office/t3.txt"]
+        env = OfficeWorld()
+        super().__init__(GridEnv(env),rm_files)
+
+class OfficeRM3_10SecEnv(GridRMEnv):
+    def __init__(self):
+        rm_files = ["./envs/grids/reward_machines/office/t3_10sec.txt"]
         env = OfficeWorld()
         super().__init__(GridEnv(env),rm_files)
 
@@ -249,4 +260,3 @@ class CraftRM10EnvM10(CraftRM10Env):
     def __init__(self):
         file_map = "./envs/grids/maps/map_10.txt"
         super().__init__(file_map)
-

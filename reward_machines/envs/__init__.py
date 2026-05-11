@@ -47,6 +47,27 @@ register(
     max_episode_steps=1000
 )
 
+register(
+    id='Office-single-10sec-v0',
+    entry_point='envs.grids.grid_environment:OfficeRM3_10SecEnv',
+    max_episode_steps=1000
+)
+
+# ----------------------------------------- OFFICE (RANDOMIZED)
+register(
+    id='Office-random-v0',
+    entry_point='envs.grids.grid_environment:OfficeRMEnv',
+    max_episode_steps=1000,
+    kwargs={'randomization': 'objects'}
+)
+
+register(
+    id='Office-random-single-v0',
+    entry_point='envs.grids.grid_environment:OfficeRM3Env',
+    max_episode_steps=1000,
+    kwargs={'randomization': 'objects'}
+)
+
 # ----------------------------------------- CRAFT
 for i in range(11):
     w_id = 'Craft-M%d-v0'%i

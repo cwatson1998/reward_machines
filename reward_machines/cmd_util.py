@@ -22,6 +22,18 @@ from baselines.common.cmd_util import arg_parser
 
 from reward_machines.rm_environment import RewardMachineWrapper, HierarchicalRMWrapper
 
+
+class DotAccessDict(dict):
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(f"'DotAccessDict' object has no attribute '{key}'")
+    
+    def __setattr__(self, key, value):
+        self[key] = value
+    
+
 def make_vec_env(env_id, env_type, num_env, seed, args, 
                  wrapper_kwargs=None,
                  env_kwargs=None,
@@ -63,11 +75,18 @@ def make_vec_env(env_id, env_type, num_env, seed, args,
         return DummyVecEnv([make_thunk(i + start_index, initializer=None) for i in range(num_env)])
 
 def make_env(env_id, env_type, args, mpi_rank=0, subrank=0, seed=None, reward_scale=1.0, gamestate=None, flatten_dict_observations=True, wrapper_kwargs=None, env_kwargs=None, logger_dir=None, initializer=None):
+    if isinstance(args, dict):
+        args = DotAccessDict(args)
+    
     if initializer is not None:
         initializer(mpi_rank=mpi_rank, subrank=subrank)
 
     wrapper_kwargs = wrapper_kwargs or {}
     env_kwargs = env_kwargs or {}
+    
+    print(f"DEBUG make_env: env_id = {env_id}")
+    print(f"DEBUG make_env: env_kwargs = {env_kwargs}")
+    
     if ':' in env_id:
         import re
         import importlib
@@ -126,4 +145,9 @@ def common_arg_parser():
     parser.add_argument('--r_min', help="R-min reward used for training option policies in hrm", type=float, default=0.0)
     parser.add_argument('--r_max', help="R-max reward used for training option policies in hrm", type=float, default=1.0)
     parser.add_argument("--use_self_loops", help="Add option policies for self-loops in the RMs", action="store_true", default=False)
+    # Visualization (performs no training)
+    parser.add_argument("--no_learn", help="Do not train", default=False)
+    parser.add_argument("--save_play_jpgs", help="save_play_jpgs", default=False)
+    
+
     return parser

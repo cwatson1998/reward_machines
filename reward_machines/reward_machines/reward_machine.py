@@ -56,6 +56,9 @@ class RewardMachine:
         # Getting the reward
         rew = self._get_reward(u1,u2,s_info,add_rs, env_done)
 
+        # Chris added this hack:
+        if "n" in true_props:
+            rew = 0
         return u2, rew, done
 
 
@@ -83,6 +86,8 @@ class RewardMachine:
             un = self.terminal_u if env_done else u2 # If the env reached a terminal state, we have to use the potential from the terminal RM state to keep RS optimality guarantees
             rs = self.gamma * self.potentials[un] - self.potentials[u1]
         # Returning final reward
+        # Quick hack by chris to make going to error state give reward of 0.
+        
         return reward + rs
 
 
@@ -106,6 +111,7 @@ class RewardMachine:
         terminal_states = eval(lines[1])
         # adding transitions
         for e in lines[2:]:
+            #print(f'debug: {e}')
             # Reading the transition
             u1, u2, dnf_formula, reward_function = eval(e)
             # terminal states

@@ -6,6 +6,9 @@ import gym
 from collections import defaultdict
 import tensorflow as tf
 import numpy as np
+import cv2
+from PIL import Image
+import imageio
 
 from baselines.common.vec_env import VecFrameStack, VecNormalize, VecEnv
 from baselines.common.vec_env.vec_video_recorder import VecVideoRecorder
@@ -69,9 +72,15 @@ def train(args, extra_args):
     alg_kwargs.update(extra_args)
 
     env = build_env(args)
+    eval_env = build_env(args)
+    
+    # if args.show_env:
+    #    print("about to try to show")
+    #    env.show()
+    #    return None, None
+
     if args.save_video_interval != 0:
         env = VecVideoRecorder(env, osp.join(logger.get_dir(), "videos"), record_video_trigger=lambda x: x % args.save_video_interval == 0, video_length=args.save_video_length)
-
     if args.network:
         alg_kwargs['network'] = args.network
     else:
@@ -85,13 +94,30 @@ def train(args, extra_args):
 
     print('Training {} on {}:{} with arguments \n{}'.format(args.alg, env_type, env_id, alg_kwargs))
 
-    model = learn(
-        env=env,
-        seed=seed,
-        total_timesteps=total_timesteps,
-        **alg_kwargs
-    )
-
+    if args.no_learn:
+        print("no-learn so no model")
+        model = None
+    else:
+        try:
+            model = learn(
+                env=env,
+                seed=seed,
+                total_timesteps=total_timesteps,
+                eval_env=eval_env,
+                eval_episodes=20,
+                **alg_kwargs
+            )
+        except (TypeError, AttributeError):
+            print("learn function does not accept an eval env.")
+            # This exception happens if learn does not expect some of the kwargs
+            model = learn(
+                env=env,
+                seed=seed,
+                total_timesteps=total_timesteps,
+                **alg_kwargs
+            )
+    print("model type is ")
+    print(type(model))
     return model, env
 
 
@@ -103,9 +129,18 @@ def build_env(args):
     seed = args.seed
 
     env_type, env_id = get_env_type(args)
+    
+    # Get the environment spec to access its kwargs
+    env_spec = gym.envs.registry.env_specs[env_id]
+    env_kwargs = env_spec._kwargs if hasattr(env_spec, '_kwargs') else {}
+    
+    print(f"DEBUG: env_id = {env_id}")
+    print(f"DEBUG: env_spec = {env_spec}")
+    print(f"DEBUG: env_kwargs = {env_kwargs}")
+    print(f"DEBUG: env_spec attributes = {dir(env_spec)}")
 
-    if alg in ['deepq', 'qlearning', 'hrm', 'dhrm']:
-        env = make_env(env_id, env_type, args, seed=seed, logger_dir=logger.get_dir())
+    if alg in ['deepq', 'qlearning', 'hrm', 'dhrm', 'value_iteration']:
+        env = make_env(env_id, env_type, args, seed=seed, logger_dir=logger.get_dir(), env_kwargs=env_kwargs)
     else:
         config = tf.ConfigProto(allow_soft_placement=True,
                                intra_op_parallelism_threads=1,
@@ -114,7 +149,7 @@ def build_env(args):
         get_session(config=config)
 
         flatten_dict_observations = alg not in {'her'}
-        env = make_vec_env(env_id, env_type, args.num_env or 1, seed, args, reward_scale=args.reward_scale, flatten_dict_observations=flatten_dict_observations)
+        env = make_vec_env(env_id, env_type, args.num_env or 1, seed, args, reward_scale=args.reward_scale, flatten_dict_observations=flatten_dict_observations, env_kwargs=env_kwargs)
 
         if env_type == 'mujoco':
             env = VecNormalize(env, use_tf=True)
@@ -203,6 +238,11 @@ def configure_logger(log_path, **kwargs):
     else:
         logger.configure(**kwargs)
 
+def parse_rm_state(gridworld_obs):
+    raise NotImplementedError("The observation renames the states.")
+
+        
+
 
 def main(args):
     # configure logger, disable logging in child MPI processes (with rank > 0)
@@ -219,6 +259,17 @@ def main(args):
         configure_logger(args.log_path, format_strs=[])
 
     model, env = train(args, extra_args)
+    print("about to show in main")
+    print(type(env))
+    # env.show()  # Commented out to avoid interactive mode during play
+    
+    # Render the environment and save as JPEG
+    env.reset()
+    rgb_array = env.env.render(mode='rgb_array')
+    if rgb_array is not None:
+        image = Image.fromarray(rgb_array)
+        image.save('./scratch_render.jpg')
+        print("Saved render to ./scratch_render.jpg")
 
     if args.save_path is not None and rank == 0:
         save_path = osp.expanduser(args.save_path)
@@ -226,26 +277,102 @@ def main(args):
 
     if args.play:
         logger.log("Running trained model")
+        print(f"Model type: {type(model)}")
+        print("DEBUG: forcing epsilon to 0")
+        model.epsilon = 0
+        print("Starting play mode with trained model...")
+        
         obs = env.reset()
+        print(f"Initial observation: {obs}")
 
         state = model.initial_state if hasattr(model, 'initial_state') else None
         dones = np.zeros((1,))
 
         episode_rew = np.zeros(env.num_envs) if isinstance(env, VecEnv) else np.zeros(1)
+        step_count = 0
+        episode_count = 0
+        frames = []  # Store frames for current episode
+        
+        # Capture initial frame
+        frame = env.render(mode='rgb_array')
+        if frame is not None:
+            frames.append(frame)
+        
         while True:
             if state is not None:
                 actions, _, state, _ = model.step(obs,S=state, M=dones)
             else:
-                actions, _, _, _ = model.step(obs)
+                # Pass environment to value iteration models for optimal action selection
+                if hasattr(model, '__class__') and 'ValueIteration' in model.__class__.__name__:
+                    actions, _, _, _ = model.step(obs, env=env)
+                else:
+                    actions, _, _, _ = model.step(obs)
 
+            print(f"Step {step_count}: obs={obs}, action={actions}")
             obs, rew, done, _ = env.step(actions)
             episode_rew += rew
-            env.render()
+            step_count += 1
+            
+            # Capture frame after taking action
+            rm_state = env.current_u_id
+            frame = env.render(mode='rgb_array')
+            if frame is not None:
+                cv2.putText(frame, f"RM State: {rm_state}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 20, 147), 2)
+                cv2.putText(frame, f"Reward: {rew}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 20, 147), 2)
+                cv2.putText(frame, f"Ep Reward: {episode_rew}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 20, 147), 2)
+                cv2.putText(frame, f"Step: {step_count}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 20, 147), 2)
+                cv2.putText(frame, f"Events: {env.get_events()}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 20, 147), 2)
+                frames.append(frame)
+                
+                
+            
             done_any = done.any() if isinstance(done, np.ndarray) else done
             if done_any:
+                episode_count += 1
                 for i in np.nonzero(done)[0]:
-                    print('episode_rew={}'.format(episode_rew[i]))
+                    print(f'Episode {episode_count} finished with reward={episode_rew[i]}')
                     episode_rew[i] = 0
+                
+                # Save video for this episode
+                if frames:
+                    gif_path = f"episode_{episode_count}_rollout.gif"
+                    print(f"Saving video with {len(frames)} frames to {gif_path}")
+                    try:
+                        imageio.mimsave(gif_path, frames, duration=1)
+                        print(f"GIF saved successfully to {gif_path}")
+                    except Exception as e:
+                        print(f"Error saving GIF: {e}")
+                        print("Skipping video save for this episode.")
+                    
+                    # Save individual frames as JPEGs if requested
+                    if args.save_play_jpgs:
+                        import os
+                        jpg_dir = f"episode_{episode_count}_frames"
+                        os.makedirs(jpg_dir, exist_ok=True)
+                        for i, frame in enumerate(frames):
+                            jpg_path = os.path.join(jpg_dir, f"frame_{i:03d}.jpg")
+                            try:
+                                image = Image.fromarray(frame)
+                                image.save(jpg_path)
+                                print(f"Saved frame {i} to {jpg_path}")
+                            except Exception as e:
+                                print(f"Error saving frame {i}: {e}")
+                
+                obs = env.reset()
+                step_count = 0
+                frames = []  # Reset frames for next episode
+                
+                # Capture initial frame of new episode
+                frame = env.render(mode='rgb_array')
+                if frame is not None:
+                    frames.append(frame)
+                
+                print(f"New episode {episode_count + 1} started")
+                
+                # Stop after a few episodes for testing
+                if episode_count >= 3:
+                    print("Stopping after 3 episodes")
+                    break
 
     env.close()
 
@@ -266,6 +393,8 @@ if __name__ == '__main__':
     #        >>> python3.6 run.py --alg=hrm --env=Office-v0 --num_timesteps=1e5 --gamma=0.9
     #    HRM with reward shaping: 
     #        >>> python3.6 run.py --alg=hrm --env=Office-v0 --num_timesteps=1e5 --gamma=0.9 --use_rs
+    #    Value Iteration (optimal policy): 
+    #        >>> python3.6 run.py --alg=value_iteration --env=Office-v0 --gamma=0.9 --play
     # NOTE: The complete list of experiments (that we reported in the paper) can be found on '../scripts' 
 
     import time
